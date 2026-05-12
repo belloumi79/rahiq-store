@@ -1,0 +1,9 @@
+/* Suppress CSS parsing warnings from Tailwind CDN */
+* {
+  -webkit-text-size-adjust: unset;
+  -moz-text-size-adjust: unset;
+  text-size-adjust: unset;
+  font-variation-settings: normal;
+  -moz-column-gap: unset;
+  column-gap: unset;
+}

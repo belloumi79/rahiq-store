@@ -1,187 +1,146 @@
-import React, { useEffect, useState } from 'react';
-import { CATEGORIES, MOCK_PRODUCTS } from '../constants';
-import ProductCard from '../components/ProductCard';
-import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Truck, Award, Leaf, ShieldCheck, Heart, Loader } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { supabase, mapProductFromSupabase } from '../lib/supabase';
-import { Product, CategoryData } from '../types';
+import { Product } from '../types';
+import { Star, ShoppingCart, Leaf, Award } from 'lucide-react';
+import RahiqLogo from '../components/RahiqLogo';
 
 const Home: React.FC = () => {
-  const navigate = useNavigate();
-  const [popularProducts, setPopularProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<CategoryData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingCats, setLoadingCats] = useState(true);
+    const { addToCart } = useCart();
+    const { isAdmin } = useAuth();
+    const { dir, t } = useLanguage();
+    const navigate = useNavigate();
+    const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-        try {
-            const { data } = await supabase.from('categories').select('*').order('name');
-            if (data && data.length > 0) setCategories(data);
-            else {
-                 const staticCats = CATEGORIES.slice(1).map((c, i) => ({ id: i.toString(), name: c, image: '' }));
-                 setCategories(staticCats);
-            }
-        } catch (error) {
-            const staticCats = CATEGORIES.slice(1).map((c, i) => ({ id: i.toString(), name: c, image: '' }));
-            setCategories(staticCats);
-        } finally { setLoadingCats(false); }
+    useEffect(() => {
+        const load = async () => {
+            setLoading(true);
+            const [catRes, prodRes] = await Promise.all([
+                supabase.from('categories').select('*').order('name'),
+                supabase.from('products').select('*, categories(name)').order('created_at', { ascending: false })
+            ]);
+            if (catRes.data) setCategories(catRes.data);
+            if (prodRes.data) setProducts(prodRes.data.map(mapProductFromSupabase));
+            setLoading(false);
+        };
+        load();
+    }, []);
+
+    const handleAddToCart = (product: Product) => {
+        addToCart(product);
     };
 
-    const fetchProducts = async () => {
-        try {
-            const { data, error } = await supabase.from('products').select('*').limit(4);
-            if (error) throw error;
-            if (!data || data.length === 0) setPopularProducts(MOCK_PRODUCTS.slice(0, 4));
-            else setPopularProducts(data.map(mapProductFromSupabase));
-        } catch (error) {
-            setPopularProducts(MOCK_PRODUCTS.slice(0, 4));
-        } finally { setLoading(false); }
+    const categoryEmoji: Record<string, string> = {
+        'Miel': '🌻', 'miel': '🌻',
+        'Dérivés': '🍯', 'Dérivés de la Ruche': '🍯', 'dérivés': '🍯',
+        'Coffrets': '🎁', 'coffrets': '🎁',
     };
 
-    fetchCategories();
-    fetchProducts();
-  }, []);
-
-  return (
-    <div className="pb-8">
-      {/* Hero Section */}
-      <div className="px-4 mb-8 pt-2">
-        <div className="bg-gradient-to-br from-amber-900 via-amber-800 to-orange-800 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-xl min-h-[300px] flex flex-col justify-center">
-            <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&q=80')] bg-cover bg-center mix-blend-overlay"></div>
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-900/90 via-amber-800/80 to-transparent"></div>
-
-            <div className="relative z-10">
-                <div className="inline-flex items-center gap-1 px-3 py-1 bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-bold rounded-full mb-4 backdrop-blur-sm">
-                    <Leaf size={12} /> 100% Miel & Produits de la Ruche
+    return (
+        <div dir={dir}>
+            {/* Hero Section */}
+            <section className="relative bg-gradient-to-br from-amber-100 via-amber-50 to-orange-50 px-6 py-10 text-center overflow-hidden">
+                <div className="absolute inset-0 opacity-10">
+                    <div className="absolute top-4 left-8 w-20 h-20 bg-amber-400 rounded-full blur-2xl" />
+                    <div className="absolute bottom-4 right-8 w-32 h-32 bg-orange-300 rounded-full blur-3xl" />
                 </div>
-                <h1 className="text-3xl md:text-4xl font-serif font-bold mb-3 leading-tight">
-                    Le trésor doré de la <span className="text-amber-300">Tunisie</span>
-                </h1>
-                <p className="text-amber-100 text-sm mb-6 leading-relaxed max-w-sm">
-                    Miel de thym, propolis, gelée royale et pollen. Des produits de la ruche naturels, récoltés avec passion par des apiculteurs tunisiens.
-                </p>
-                <button
-                    onClick={() => navigate('/marketplace')}
-                    className="bg-amber-500 hover:bg-amber-400 text-white px-6 py-3 rounded-xl font-semibold text-sm shadow-lg shadow-amber-900/50 active:scale-95 transition-all flex items-center gap-2 w-fit"
-                >
-                    Découvrir nos produits <ArrowRight size={16} />
-                </button>
-            </div>
-        </div>
-      </div>
-
-      {/* Value Propositions */}
-      <div className="grid grid-cols-4 gap-2 px-4 mb-10 text-center">
-        <div className="flex flex-col items-center gap-2">
-            <div className="w-12 h-12 rounded-2xl bg-white border border-amber-100 shadow-sm flex items-center justify-center text-amber-600">
-                <ShieldCheck size={24} strokeWidth={1.5} />
-            </div>
-            <span className="text-[10px] font-medium text-gray-600 leading-tight">Zéro<br/>Additif</span>
-        </div>
-        <div className="flex flex-col items-center gap-2">
-            <div className="w-12 h-12 rounded-2xl bg-white border border-amber-100 shadow-sm flex items-center justify-center text-amber-600">
-                <Award size={24} strokeWidth={1.5} />
-            </div>
-            <span className="text-[10px] font-medium text-gray-600 leading-tight">Artisanal<br/>& Local</span>
-        </div>
-        <div className="flex flex-col items-center gap-2">
-            <div className="w-12 h-12 rounded-2xl bg-white border border-amber-100 shadow-sm flex items-center justify-center text-green-600">
-                <Leaf size={24} strokeWidth={1.5} />
-            </div>
-            <span className="text-[10px] font-medium text-gray-600 leading-tight">100%<br/>Naturel</span>
-        </div>
-        <div className="flex flex-col items-center gap-2">
-            <div className="w-12 h-12 rounded-2xl bg-white border border-amber-100 shadow-sm flex items-center justify-center text-blue-600">
-                <Truck size={24} strokeWidth={1.5} />
-            </div>
-            <span className="text-[10px] font-medium text-gray-600 leading-tight">Livraison<br/>Rapide</span>
-        </div>
-      </div>
-
-      {/* Categories */}
-      <div className="px-4 mb-10">
-        <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-amber-900 font-serif">Nos Univers</h2>
-            <button onClick={() => navigate('/marketplace')} className="text-amber-600 text-sm font-medium">Voir tout</button>
-        </div>
-
-        {loadingCats ? (
-            <div className="flex justify-center py-4"><Loader className="animate-spin text-amber-600" size={24} /></div>
-        ) : (
-            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
-                {categories.map((cat, idx) => (
-                    <div
-                        key={idx}
-                        onClick={() => navigate(`/marketplace?category=${encodeURIComponent(cat.name)}`)}
-                        className="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer group"
-                    >
-                        <div className="w-20 h-20 rounded-full bg-white shadow-md border-2 border-white p-1 group-hover:border-amber-400 transition-colors relative overflow-hidden">
-                            {cat.image ? (
-                                <img src={cat.image} className="w-full h-full object-cover rounded-full" alt={cat.name} onError={(e) => { (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${cat.name}&background=fde68a&color=92400e`; }} />
-                            ) : (
-                                <img src={`https://ui-avatars.com/api/?name=${cat.name}&background=fde68a&color=92400e`} className="w-full h-full object-cover rounded-full" alt={cat.name} />
-                            )}
-                        </div>
-                        <span className="text-xs font-semibold text-gray-700 max-w-[80px] text-center truncate">{cat.name}</span>
+                <div className="relative z-10 flex flex-col items-center">
+                    <RahiqLogo className="w-32 h-32 mb-4" showText={false} />
+                    <h1 className="text-3xl font-bold text-amber-900 mb-3 font-serif leading-tight whitespace-pre-line">{t.home.heroTitle}</h1>
+                    <p className="text-amber-700 text-sm mb-6 max-w-xs mx-auto leading-relaxed">{t.home.heroSub}</p>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <button onClick={() => navigate('/marketplace')}
+                            className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-full font-semibold text-sm transition-colors shadow-lg">
+                            {t.home.cta}
+                        </button>
+                        {isAdmin && (
+                            <button onClick={() => navigate('/admin')}
+                                className="bg-amber-900 hover:bg-amber-950 text-amber-100 px-6 py-3 rounded-full font-semibold text-sm transition-colors">
+                                {t.nav.admin}
+                            </button>
+                        )}
                     </div>
-                ))}
-            </div>
-        )}
-      </div>
+                    <div className="flex items-center gap-4 mt-6">
+                        <span className="flex items-center gap-1 text-xs text-amber-700 font-medium"><Leaf size={14} className="text-green-600" />{t.home.organic}</span>
+                        <span className="flex items-center gap-1 text-xs text-amber-700 font-medium"><Award size={14} className="text-amber-600" />{t.home.fromTunisia}</span>
+                    </div>
+                </div>
+            </section>
 
-      {/* Engagement Section */}
-      <div className="px-4 mb-10">
-        <div className="bg-amber-50 rounded-2xl p-6 border border-amber-100 relative overflow-hidden">
-            <div className="absolute top-0 right-0 -mt-4 -mr-4 text-amber-200 opacity-50">
-                <Leaf size={100} />
-            </div>
-            <h3 className="text-lg font-bold text-amber-900 mb-3 font-serif flex items-center gap-2">
-                <Heart size={20} className="text-amber-600" fill="currentColor" />
-                Notre Engagement
-            </h3>
-            <p className="text-sm text-gray-700 leading-relaxed mb-4">
-                Chez Rahiq Store, chaque produit a une histoire. Nous collaborons directement avec des apiculteurs tunisiens qui respectent la nature et les traditions apicoles.
-            </p>
-            <ul className="space-y-2 mb-4">
-                <li className="flex items-center gap-2 text-xs font-bold text-amber-800">
-                    <span className="w-1.5 h-1.5 bg-amber-600 rounded-full"></span> Miel 100% pur, sans sirop ni additif
-                </li>
-                <li className="flex items-center gap-2 text-xs font-bold text-amber-800">
-                    <span className="w-1.5 h-1.5 bg-amber-600 rounded-full"></span> Produits de la ruche naturels et non transformés
-                </li>
-                <li className="flex items-center gap-2 text-xs font-bold text-amber-800">
-                    <span className="w-1.5 h-1.5 bg-amber-600 rounded-full"></span> 100% Tunisien, du terroir à votre table
-                </li>
-            </ul>
+            {/* Categories */}
+            <section className="px-4 py-6">
+                <h2 className="text-lg font-bold text-amber-900 mb-4">{t.home.categories}</h2>
+                {loading ? (
+                    <div className="grid grid-cols-3 gap-3">
+                        {[1,2,3].map(i => <div key={i} className="bg-gray-100 rounded-2xl h-24 animate-pulse" />)}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-3 gap-3">
+                        {categories.map((cat) => (
+                            <Link key={cat.id} to={`/marketplace?cat=${encodeURIComponent(cat.name)}`}
+                                className="bg-white rounded-2xl overflow-hidden text-center shadow-sm border border-amber-100 hover:shadow-md transition-shadow">
+                                <div className="aspect-square bg-amber-50 overflow-hidden">
+                                    {cat.image ? (
+                                        <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-4xl">{categoryEmoji[cat.name] || '🍯'}</div>
+                                    )}
+                                </div>
+                                <div className="p-2">
+                                    <span className="text-xs font-semibold text-amber-800">{cat.name}</span>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+            </section>
+
+            {/* All Products */}
+            <section className="px-4 pb-8">
+                <h2 className="text-lg font-bold text-amber-900 mb-4">{t.home.featured}</h2>
+                {loading ? (
+                    <div className="grid grid-cols-2 gap-3">
+                        {[1,2,3,4,5,6].map(i => <div key={i} className="bg-gray-100 rounded-2xl h-64 animate-pulse" />)}
+                    </div>
+                ) : products.length === 0 ? (
+                    <div className="text-center py-12 text-gray-400">
+                        <p>{t.marketplace.noProducts}</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 gap-3">
+                        {products.map((product) => (
+                            <div key={product.id} onClick={() => navigate(`/product/${product.id}`)}
+                                className="bg-white rounded-2xl overflow-hidden shadow-sm border border-amber-100 hover:shadow-md transition-all cursor-pointer">
+                                <div className="aspect-square bg-amber-50 overflow-hidden">
+                                    <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                                </div>
+                                <div className="p-3">
+                                    <span className="text-[10px] text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded-full">{product.category}</span>
+                                    <h3 className="font-semibold text-amber-900 text-sm mt-1 leading-tight">{product.name}</h3>
+                                    <div className="flex items-center gap-1 mt-1">
+                                        <Star size={12} className="text-amber-400 fill-amber-400" />
+                                        <span className="text-xs text-gray-500">{product.rating} ({product.reviews})</span>
+                                    </div>
+                                    <div className="flex items-center justify-between mt-2">
+                                        <span className="font-bold text-amber-800">{product.price} TND</span>
+                                        <button onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
+                                            className="bg-amber-100 hover:bg-amber-200 text-amber-700 p-1.5 rounded-full transition-colors">
+                                            <ShoppingCart size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </section>
         </div>
-      </div>
-
-      {/* Popular Products */}
-      <div className="px-4 mb-4">
-        <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-amber-900 font-serif">Nos Meilleures Ventes</h2>
-        </div>
-
-        {loading ? (
-            <div className="flex justify-center py-10"><Loader className="animate-spin text-amber-600" size={32} /></div>
-        ) : (
-            <div className="grid grid-cols-2 gap-4">
-                {popularProducts.map(product => (
-                    <ProductCard key={product.id} product={product} />
-                ))}
-            </div>
-        )}
-
-        <button
-            onClick={() => navigate('/marketplace')}
-            className="w-full mt-6 py-4 border border-amber-200 text-amber-800 font-semibold rounded-xl hover:bg-amber-100 transition-colors flex items-center justify-center gap-2"
-        >
-            Voir toute la boutique
-        </button>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Home;

@@ -1,3 +1,9 @@
+export interface CategoryData {
+  id?: string;
+  name: string;
+  image: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -6,18 +12,14 @@ export interface Product {
   image: string;
   description: string;
   producer: string;
+  origin?: string;
+  weight?: string;
   benefits: string[];
   ingredients: string[];
   isOrganic: boolean;
   isArtisanal: boolean;
   rating: number;
   reviews: number;
-}
-
-export interface CategoryData {
-  id?: string;
-  name: string;
-  image: string;
 }
 
 export interface CartItem extends Product {
@@ -32,8 +34,7 @@ export interface User {
 }
 
 export enum Category {
-  ALL = 'Tous',
   HONEY = 'Miel',
-  DERIVATIVES = 'Dérivés',
-  COMBOS = 'Coffrets'
+  DERIVATIVES = 'Dérivés de la Ruche',
+  BOXES = 'Coffrets'
 }

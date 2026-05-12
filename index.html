@@ -51,14 +51,11 @@
         }
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Remove Google Fonts importmap that causes browser CSS warnings -->
+    <!-- Inline font CSS to avoid -webkit-text-size-adjust and font-variation-settings errors -->
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
-        background-color: #fffbeb;
-      }
-      .no-scrollbar::-webkit-scrollbar { display: none; }
-      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+      *, *::before, *::after { box-sizing: border-box; }
     </style>
   <script type="importmap">
 {

@@ -1,101 +1,71 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import { ArrowLeft, Package, Loader, Calendar, MapPin, ChevronRight, ShoppingBag } from 'lucide-react';
+import { Package, ShoppingBag, Phone, MapPin } from 'lucide-react';
+import { t } from '../i18n';
 
 const Orders: React.FC = () => {
-    const { user, loading: authLoading } = useAuth();
+    const { user } = useAuth();
+    const { dir } = useLanguage();
     const navigate = useNavigate();
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!authLoading && !user) { navigate('/login'); return; }
-
+        if (!user) { navigate('/login'); return; }
         const fetchOrders = async () => {
-            if (!user) return;
-            try {
-                const { data, error } = await supabase
-                    .from('orders')
-                    .select('*')
-                    .eq('user_id', user.id)
-                    .order('created_at', { ascending: false });
-                if (error) throw error;
-                setOrders(data || []);
-            } catch (error) { console.error("Erreur chargement commandes", error); }
-            finally { setLoading(false); }
+            const { data } = await supabase.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+            if (data) setOrders(data);
+            setLoading(false);
         };
+        fetchOrders();
+    }, [user]);
 
-        if (user) fetchOrders();
-    }, [user, authLoading, navigate]);
-
-    if (loading || authLoading) {
-        return <div className="flex justify-center items-center min-h-screen"><Loader className="animate-spin text-amber-600" size={32} /></div>;
-    }
+    const statusColor = (s: string) => ({
+        pending: 'bg-amber-100 text-amber-700',
+        confirmed: 'bg-blue-100 text-blue-700',
+        delivered: 'bg-green-100 text-green-700',
+        cancelled: 'bg-red-100 text-red-700',
+    }[s] || 'bg-gray-100 text-gray-700');
 
     return (
-        <div className="px-4 pt-4 pb-20 min-h-screen bg-amber-50">
-            <div className="flex items-center gap-4 mb-6">
-                <button onClick={() => navigate(-1)} className="p-2 hover:bg-white rounded-full transition-colors"><ArrowLeft size={24} /></button>
-                <h1 className="text-2xl font-serif font-bold text-amber-900">Mes Commandes</h1>
-            </div>
+        <div className="px-4 py-4" dir={dir}>
+            <h1 className="text-xl font-bold text-amber-900 mb-6">{t('orders.title')}</h1>
 
             {orders.length === 0 ? (
-                <div className="flex flex-col items-center justify-center pt-20 text-center opacity-60">
-                    <Package size={64} className="text-amber-300 mb-4" />
-                    <h2 className="text-xl font-bold text-amber-700">Aucune commande</h2>
-                    <p className="text-sm text-gray-500 mb-6">Vos commandes apparaîtront ici.</p>
-                    <button onClick={() => navigate('/marketplace')} className="bg-amber-600 text-white px-6 py-2 rounded-xl font-bold">
-                        Découvrir nos produits
+                <div className="text-center py-16">
+                    <Package size={56} className="mx-auto text-amber-200 mb-4" />
+                    <p className="text-amber-700 font-bold text-lg mb-2">{t('orders.empty')}</p>
+                    <p className="text-amber-500 text-sm mb-6">{t('orders.emptySub')}</p>
+                    <button onClick={() => navigate('/marketplace')} className="bg-amber-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-amber-700 transition-colors">
+                        {t('orders.discover')}
                     </button>
                 </div>
             ) : (
                 <div className="space-y-4">
-                    {orders.map((order) => (
-                        <div key={order.id} className="bg-white p-5 rounded-2xl shadow-sm border border-amber-200">
-                            <div className="flex justify-between items-start mb-4 border-b border-amber-50 pb-3">
+                    {orders.map(order => (
+                        <div key={order.id} className="bg-white rounded-xl border border-amber-100 p-4 shadow-sm">
+                            <div className="flex items-start justify-between mb-2">
                                 <div>
-                                    <div className="text-xs text-amber-400 font-bold uppercase tracking-wider mb-1">Commande #{order.id.slice(0, 6)}</div>
-                                    <div className="flex items-center gap-1 text-sm text-gray-600">
-                                        <Calendar size={14} />
-                                        {new Date(order.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                                    </div>
+                                    <p className="font-bold text-amber-900 text-sm">#{order.id.slice(0, 8)}</p>
+                                    <p className="text-xs text-gray-400">{new Date(order.created_at).toLocaleDateString()}</p>
                                 </div>
-                                <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
-                                    order.status === 'delivered' ? 'bg-green-100 text-green-700' :
-                                    order.status === 'confirmed' ? 'bg-blue-100 text-blue-700' :
-                                    order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                                    'bg-yellow-100 text-yellow-700'
-                                }`}>
-                                    {order.status === 'pending' ? 'En Attente' :
-                                     order.status === 'confirmed' ? 'Confirmée' :
-                                     order.status === 'delivered' ? 'Livrée' :
-                                     order.status === 'cancelled' ? 'Annulée' : order.status}
-                                </div>
+                                <span className={`text-xs font-bold px-3 py-1 rounded-full ${statusColor(order.status)}`}>
+                                    {t(`orders.status.${order.status}` as any) || order.status}
+                                </span>
                             </div>
-
-                            <div className="mb-4">
-                                <div className="text-sm font-medium text-amber-800 mb-2 flex items-center gap-2">
-                                    <ShoppingBag size={16} className="text-amber-600" /> Articles
-                                </div>
-                                <ul className="space-y-2 pl-6 border-l-2 border-amber-100">
-                                    {order.items?.map((item: any, idx: number) => (
-                                        <li key={idx} className="text-sm text-gray-600 flex justify-between">
-                                            <span>{item.quantity}x {item.name}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            <div className="flex items-center justify-between pt-2">
-                                <div className="text-xs text-amber-400 flex items-center gap-1">
-                                    <MapPin size={12} /> Livraison incluse
-                                </div>
-                                <div className="text-lg font-bold text-amber-700">
-                                    {order.total_amount.toFixed(3)} DT
-                                </div>
-                            </div>
+                            <p className="text-sm text-gray-600 mb-2">{order.items}</p>
+                            {order.phone && (
+                                <div className="flex items-center gap-1 text-xs text-gray-500 mb-1"><Phone size={12} /> {order.phone}</div>
+                            )}
+                            {order.delivery_address && (
+                                <div className="flex items-center gap-1 text-xs text-gray-500 mb-2"><MapPin size={12} /> {order.delivery_address}</div>
+                            )}
+                            {order.total && (
+                                <p className="text-right font-bold text-amber-800 text-sm mt-2">{parseFloat(order.total).toFixed(3)} TND</p>
+                            )}
                         </div>
                     ))}
                 </div>
