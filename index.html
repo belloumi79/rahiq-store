@@ -3,75 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; script-src * data: blob: 'unsafe-inline' 'unsafe-eval'; connect-src * data: blob: 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * data: blob: 'unsafe-inline';">
-    <title>Rahiq Store — Miel & Produits de la Ruche</title>
-    <meta name="description" content="Boutique tunisienne de miel et produits de la ruche. Miel de thym, propolis, gelée royale, pollen et hydromel artisanal. 100% naturel, 100% Tunisien." />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              rahiq: {
-                50: '#fffbeb',
-                100: '#fef3c7',
-                200: '#fde68a',
-                300: '#fcd34d',
-                400: '#fbbf24',
-                500: '#f59e0b',
-                600: '#d97706',
-                700: '#b45309',
-                800: '#92400e',
-                900: '#78350f',
-              },
-              honey: {
-                50: '#fff7ed',
-                100: '#ffedd5',
-                200: '#fed7aa',
-                300: '#fdba74',
-                400: '#fb923c',
-                500: '#f97316',
-                600: '#ea580c',
-                700: '#c2410c',
-                800: '#9a3412',
-                900: '#7c2d12',
-              },
-              comb: {
-                50: '#fefce8',
-                100: '#fef9c3',
-                800: '#713f12',
-                900: '#422006',
-              }
-            },
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              serif: ['Merriweather', 'serif'],
-            }
-          }
-        }
-      }
-    </script>
-    <!-- Remove Google Fonts importmap that causes browser CSS warnings -->
-    <!-- Inline font CSS to avoid -webkit-text-size-adjust and font-variation-settings errors -->
+    <title>Rahiq Store - عسل طبيعي 100% تونسي</title>
+    <meta name="description" content="متجر عسل طبيعي ومنتجات النحل التونسية" />
     <style>
-      body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
       *, *::before, *::after { box-sizing: border-box; }
+      body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; -webkit-text-size-adjust: none; }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.10.1",
-    "react/": "https://aistudiocdn.com/react@^19.2.1/",
-    "react": "https://aistudiocdn.com/react@^19.2.1",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.39.3"
-  }
-}
-</script>
-<script type="module" src="/index.tsx"></script>
-</head>
+  </head>
   <body>
     <div id="root"></div>
+    <script type="module" src="./index.tsx"></script>
   </body>
 </html>
