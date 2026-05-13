@@ -139,7 +139,6 @@ export default {
       delivered: 'Livrée',
       cancelled: 'Annulée',
     },
-    tabProducts: 'Gestion Produits',
     tabCategories: 'Gestion Rayons',
     tabOrders: 'Suivi Commandes',
   },
@@ -153,3 +152,4 @@ export default {
     currency: 'TND',
   },
 };
+
