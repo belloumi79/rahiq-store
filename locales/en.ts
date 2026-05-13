@@ -8,6 +8,7 @@ export default {
     orders: 'My Orders',
     login: 'Sign In',
     logout: 'Sign Out',
+    promo: 'Free delivery on orders over 100 TND',
   },
   home: {
     heroTitle: 'Tunisian Honey,\nAuthentic & Pure',

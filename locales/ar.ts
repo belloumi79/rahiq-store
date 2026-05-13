@@ -8,6 +8,7 @@ export default {
     orders: 'طلباتي',
     login: 'تسجيل الدخول',
     logout: 'تسجيل الخروج',
+    promo: 'توصيل مجاني للطلبات فوق 100 د.ت',
   },
   home: {
     heroTitle: 'عسل تونس أصلي وطبيعي',

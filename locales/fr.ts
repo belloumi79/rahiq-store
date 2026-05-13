@@ -8,6 +8,7 @@ export default {
     orders: 'Mes Commandes',
     login: 'Se connecter',
     logout: 'Déconnecter',
+    promo: 'Livraison gratuite dès 100 TND de commande',
   },
   home: {
     heroTitle: 'Le Miel de Tunisie,\nAuthentique & Pur',
