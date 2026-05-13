@@ -1,11 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Language, LANGUAGES, getTranslations } from '../i18n';
-import type { Translations } from '../i18n';
+import { Language, LANGUAGES, t as i18nT } from '../i18n';
 
 interface LanguageContextType {
   lang: Language;
   setLang: (lang: Language) => void;
-  t: Translations;
+  t: (key: string) => string;
   dir: 'ltr' | 'rtl';
   languages: typeof LANGUAGES;
 }
@@ -27,14 +26,13 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     localStorage.setItem('rahiq_lang', l);
   };
 
-  const translations = getTranslations(lang);
   const currentLangInfo = LANGUAGES.find(l => l.code === lang) ?? LANGUAGES[0];
 
   return (
     <LanguageContext.Provider value={{
       lang,
       setLang,
-      t: translations,
+      t: (key) => i18nT(lang, key),
       dir: currentLangInfo.dir,
       languages: LANGUAGES,
     }}>
