@@ -31,7 +31,7 @@ const Cart: React.FC = () => {
                                 <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-xl" />
                                 <div className="flex-1 min-w-0">
                                     <p className="font-semibold text-amber-900 text-sm truncate">{item.name}</p>
-                                    <p className="text-amber-700 font-bold text-sm">{item.price} {t.cart.TND}</p>
+                                    <p className="text-amber-700 font-bold text-sm">{item.price} {t.cart.currency}</p>
                                     <div className="flex items-center gap-2 mt-1">
                                         <button onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                             className="bg-amber-100 text-amber-700 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold hover:bg-amber-200">−</button>
@@ -44,7 +44,7 @@ const Cart: React.FC = () => {
                                     <button onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-600 p-1">
                                         <Trash2 size={16} />
                                     </button>
-                                    <span className="font-bold text-amber-800 text-sm">{(item.price * item.quantity).toFixed(2)} {t.cart.TND}</span>
+                                    <span className="font-bold text-amber-800 text-sm">{(item.price * item.quantity).toFixed(2)} {t.cart.currency}</span>
                                 </div>
                             </div>
                         ))}
@@ -53,7 +53,7 @@ const Cart: React.FC = () => {
                     <div className="mt-4 bg-white rounded-2xl p-4 shadow-sm border border-amber-100">
                         <div className="flex justify-between items-center">
                             <span className="font-bold text-amber-900">{t.cart.total}</span>
-                            <span className="text-2xl font-bold text-amber-800">{total.toFixed(2)} {t.cart.TND}</span>
+                            <span className="text-2xl font-bold text-amber-800">{total.toFixed(2)} {t.cart.currency}</span>
                         </div>
                     </div>
 
@@ -67,7 +67,7 @@ const Cart: React.FC = () => {
                             <ShoppingBag size={18} />{t.cart.continue}
                         </button>
                         <button onClick={clearCart} className="text-red-400 text-xs hover:underline text-center">
-                            {t.cart.remove} {t.cart.title.toLowerCase()}
+                            {t.cart.remove} {'panier'}
                         </button>
                     </div>
                 </>

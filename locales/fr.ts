@@ -150,6 +150,6 @@ export default {
     close: 'Fermer',
     confirm: 'Confirmer',
     cancel: 'Annuler',
-    TND: 'TND',
+    currency: 'TND',
   },
 };
