@@ -1,15 +1,14 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, ShoppingBag, ShoppingCart, User, Instagram, Menu, X, Globe } from 'lucide-react';
+import { Home, ShoppingBag, ShoppingCart, User, Instagram, Menu, X } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
+  const { user, isAdmin } = useAuth();
   const location = useLocation();
-  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null;
-  const isAdmin = user?.role === 'admin';
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   return (
@@ -53,7 +52,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <Instagram size={20} />
               </a>
               <a href="https://www.tiktok.com/@errahik27152001" target="_blank" rel="noreferrer" className="text-gray-500 hover:text-black">
-                <span className="text-lg">📱</span>
+                <span style={{fontSize: 20}}>🎵</span>
               </a>
               <LanguageSwitcher />
               <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-gray-600">
@@ -114,7 +113,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <Instagram size={20} />
                 </a>
                 <a href="https://www.tiktok.com/@errahik27152001" target="_blank" rel="noreferrer" className="hover:text-white">
-                  📱 TikTok
+                  🎵 TikTok
                 </a>
               </div>
             </div>

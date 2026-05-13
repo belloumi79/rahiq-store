@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import supabase from '../lib/supabase';
-import { User } from '@supabase/supabase-js';
+import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 
 export interface AuthUser {
     id: string;
@@ -19,6 +18,17 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const ADMIN_EMAIL = 'houdaboughalleb591@gmail.com';
 
+const getSupabaseClient = (): SupabaseClient | null => {
+    try {
+        const url = (import.meta as any).env?.VITE_SUPABASE_URL;
+        const key = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
+        if (!url || !key) return null;
+        return createClient(url, key);
+    } catch {
+        return null;
+    }
+};
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
@@ -27,12 +37,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     useEffect(() => {
         const checkUser = async () => {
             try {
+                const supabase = getSupabaseClient();
+                if (!supabase) { setLoading(false); return; }
                 const { data: { session } } = await supabase.auth.getSession();
-                if (session?.user) mapUser(session.user);
-                else { setUser(null); setIsAdmin(false); }
+                if (session?.user) {
+                    const u = session.user;
+                    const email = u.email || '';
+                    const displayName = u.user_metadata?.full_name || email.split('@')[0] || 'Invité';
+                    setUser({ id: u.id, email, name: displayName, $createdAt: u.created_at });
+                    setIsAdmin(email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+                } else {
+                    setUser(null);
+                    setIsAdmin(false);
+                }
             } catch (error) {
                 console.error("Auth check error", error);
-                setUser(null); setIsAdmin(false);
+                setUser(null);
+                setIsAdmin(false);
             } finally {
                 setLoading(false);
             }
@@ -40,25 +61,35 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         checkUser();
 
+        const supabase = getSupabaseClient();
+        if (!supabase) return;
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            if (session?.user) mapUser(session.user);
-            else { setUser(null); setIsAdmin(false); }
+            if (session?.user) {
+                const u = session.user;
+                const email = u.email || '';
+                const displayName = u.user_metadata?.full_name || email.split('@')[0] || 'Invité';
+                setUser({ id: u.id, email, name: displayName, $createdAt: u.created_at });
+                setIsAdmin(email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+            } else {
+                setUser(null);
+                setIsAdmin(false);
+            }
             setLoading(false);
         });
 
         return () => subscription.unsubscribe();
     }, []);
 
-    const mapUser = (sbUser: User) => {
-        const email = sbUser.email || '';
-        const displayName = sbUser.user_metadata?.full_name || email.split('@')[0] || 'Invité';
-        setUser({ id: sbUser.id, email, name: displayName, $createdAt: sbUser.created_at });
-        setIsAdmin(email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
-    };
-
     const logout = async () => {
-        try { await supabase.auth.signOut(); } catch (error) { console.error("Logout error", error); }
-        finally { setIsAdmin(false); setUser(null); }
+        try {
+            const supabase = getSupabaseClient();
+            if (supabase) await supabase.auth.signOut();
+        } catch (error) {
+            console.error("Logout error", error);
+        } finally {
+            setIsAdmin(false);
+            setUser(null);
+        }
     };
 
     return (
