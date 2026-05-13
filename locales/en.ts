@@ -97,6 +97,8 @@ export default {
     noAccount: "Don't have an account? Sign up",
     hasAccount: 'Already have an account? Sign in',
     signUp: 'Sign Up',
+    or: 'or',
+    guest: 'Continue as Guest',
   },
   admin: {
     title: 'Dashboard',
@@ -127,7 +129,6 @@ export default {
     noProducts: 'No products',
     noCategories: 'No categories',
     noOrders: 'No orders',
-    orderFor: 'Order by',
     phone: 'Phone',
     delivery: 'Address',
     updateStatus: 'Update',
@@ -140,6 +141,7 @@ export default {
     tabProducts: 'Products Mgmt',
     tabCategories: 'Categories Mgmt',
     tabOrders: 'Orders Tracking',
+    orderFor: 'Order for',
   },
   common: {
     loading: 'Loading...',
@@ -148,6 +150,7 @@ export default {
     close: 'Close',
     confirm: 'Confirm',
     cancel: 'Cancel',
-    TND: 'TND',
+    currency: 'TND',
+    back: 'Back',
   },
 };

@@ -22,18 +22,18 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-screen pb-20">
       <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white p-8 rounded-b-3xl">
-        <h1 className="text-3xl font-bold">{t.heroTitle || 'Bienvenue chez Rahiq Store'}</h1>
-        <p className="text-amber-100 mt-2">{t.tagline}</p>
+        <h1 className="text-3xl font-bold">{t('home.heroTitle')}</h1>
+        <p className="text-amber-100 mt-2">{t('home.heroSub')}</p>
         <Link to="/marketplace" className="inline-block mt-4 bg-white text-amber-600 px-6 py-2 rounded-full font-semibold text-sm hover:bg-amber-50 transition">
-          {t.cta?.browse || 'Explorer'}
+          {t('home.cta')}
         </Link>
       </div>
 
       {/* Categories */}
       <div className="px-4 py-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">{t.categories?.title || 'Nos Rubriques'}</h2>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">{t('home.categories')}</h2>
         {categories.length === 0 ? (
-          <p className="text-gray-400 text-sm">Aucune catégorie</p>
+          <p className="text-gray-400 text-sm">{t('admin.noCategories')}</p>
         ) : (
           <div className="grid grid-cols-3 gap-3">
             {categories.map(c => (
@@ -54,9 +54,9 @@ const Home: React.FC = () => {
 
       {/* Featured Products */}
       <div className="px-4 py-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">{t.categories?.featured || 'Produits Populaires'}</h2>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">{t('home.featured')}</h2>
         {products.length === 0 ? (
-          <p className="text-gray-400 text-sm">Aucun produit</p>
+          <p className="text-gray-400 text-sm">{t('admin.noProducts')}</p>
         ) : (
           <div className="grid grid-cols-2 gap-3">
             {products.slice(0, 6).map(p => (
@@ -66,12 +66,12 @@ const Home: React.FC = () => {
                 )}
                 <div className="p-3">
                   <h3 className="text-sm font-semibold text-gray-800 truncate">{p.name}</h3>
-                  <p className="text-amber-600 font-bold text-sm">{p.price} {t.common?.TND || 'TND'}</p>
+                  <p className="text-amber-600 font-bold text-sm">{p.price} {t('common.currency')}</p>
                   <button
                     onClick={() => addToCart({ ...p, quantity: 1 })}
                     className="mt-2 w-full bg-amber-500 text-white text-xs py-1.5 rounded-lg font-medium"
                   >
-                    {t.cart?.add || 'Ajouter'}
+                    {t('product.addToCart')}
                   </button>
                 </div>
               </div>

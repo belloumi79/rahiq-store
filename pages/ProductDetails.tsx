@@ -31,7 +31,7 @@ const ProductDetails: React.FC = () => {
     );
 
     if (!product) return (
-        <div dir={dir} className="text-center py-16 text-gray-400">{t.marketplace.noProducts}</div>
+        <div dir={dir} className="text-center py-16 text-gray-400">{t('marketplace.noProducts')}</div>
     );
 
     return (
@@ -39,7 +39,7 @@ const ProductDetails: React.FC = () => {
             <div className="max-w-4xl mx-auto px-3 py-4">
                 <button onClick={() => navigate(-1)}
                     className="flex items-center gap-1 text-amber-700 text-sm font-medium mb-4 hover:underline">
-                    <ArrowLeft size={16} />{t.common.back}
+                    <ArrowLeft size={16} />{t('common.back')}
                 </button>
                 <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-amber-100">
                     <div className="grid md:grid-cols-2">
@@ -67,12 +67,12 @@ const ProductDetails: React.FC = () => {
                                 <div className="flex gap-2 mb-4">
                                     {product.isOrganic && (
                                         <span className="flex items-center gap-1 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">
-                                            <Leaf size={12} />{t.product.organic}
+                                            <Leaf size={12} />{t('product.organic')}
                                         </span>
                                     )}
                                     {product.isArtisanal && (
                                         <span className="flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-medium">
-                                            <Award size={12} />{t.product.artisanal}
+                                            <Award size={12} />{t('product.artisanal')}
                                         </span>
                                     )}
                                 </div>
@@ -81,7 +81,7 @@ const ProductDetails: React.FC = () => {
                                 )}
                                 {product.benefits && product.benefits.length > 0 && (
                                     <div className="mb-4">
-                                        <h3 className="text-sm font-bold text-amber-800 mb-2">{t.product.benefits}</h3>
+                                        <h3 className="text-sm font-bold text-amber-800 mb-2">{t('product.benefits')}</h3>
                                         <ul className="space-y-1">
                                             {product.benefits.map((b, i) => (
                                                 <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
@@ -105,7 +105,7 @@ const ProductDetails: React.FC = () => {
                                 </div>
                                 <button onClick={() => { addToCart({ ...product, quantity }); navigate('/cart'); }}
                                     className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-colors">
-                                    <ShoppingBag size={18} />{t.product.addToCart}
+                                    <ShoppingBag size={18} />{t('product.addToCart')}
                                 </button>
                             </div>
                         </div>

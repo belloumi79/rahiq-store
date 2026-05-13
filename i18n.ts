@@ -32,5 +32,14 @@ export function t(lang: Language, key: string): string {
     result = result?.[k];
     if (result === undefined) break;
   }
-  return result ?? key;
+
+  if (typeof result !== 'string') {
+    // If not found in current lang, try fallback to 'fr'
+    if (lang !== 'fr') {
+      return t('fr', key);
+    }
+    return key;
+  }
+
+  return result;
 }

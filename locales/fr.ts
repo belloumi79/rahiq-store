@@ -8,6 +8,7 @@ export default {
     orders: 'Mes Commandes',
     login: 'Se connecter',
     logout: 'Déconnecter',
+    promo: 'Livraison gratuite dès 100 TND de commande',
   },
   home: {
     heroTitle: 'Le Miel de Tunisie,\nAuthentique & Pur',
@@ -139,8 +140,15 @@ export default {
       delivered: 'Livrée',
       cancelled: 'Annulée',
     },
+    tabProducts: 'Gestion Produits',
     tabCategories: 'Gestion Rayons',
     tabOrders: 'Suivi Commandes',
+  },
+  footer: {
+    about: 'Votre miel 100% Tunisien, naturel et authentique.',
+    links: 'Liens',
+    follow: 'Suivez-nous',
+    rights: 'Tous droits réservés.',
   },
   common: {
     loading: 'Chargement...',
@@ -150,6 +158,6 @@ export default {
     confirm: 'Confirmer',
     cancel: 'Annuler',
     currency: 'TND',
+    back: 'Retour',
   },
 };
-

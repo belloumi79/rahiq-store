@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
-import supabase, { mapProductFromSupabase } from '../lib/supabase';
+import supabase from '../lib/supabase';
 import imageCompression from 'browser-image-compression';
-import { t } from '../i18n';
 import { Loader, Plus, Upload, Trash2, Edit2, Package, ShoppingBag, CheckCircle, FolderOpen, Mail, Phone, MapPin } from 'lucide-react';
 import RahiqLogo from '../components/RahiqLogo';
 
@@ -65,7 +64,7 @@ const AdminDashboard: React.FC = () => {
 
     useEffect(() => {
         if (!authLoading && (!user || !isAdmin)) navigate('/');
-    }, [user, isAdmin, authLoading]);
+    }, [user, isAdmin, authLoading, navigate]);
 
     useEffect(() => {
         const load = async () => {
@@ -137,13 +136,19 @@ const AdminDashboard: React.FC = () => {
             }
             setIsEditing(false); setEditId(null);
             setFormData({ name: '', category_id: '', price: '', description: '', producer: '', isOrganic: false, isArtisanal: false, image: '' });
-            setActiveTab(activeTab);
+            // Refresh list
+            const [catRes, prodRes] = await Promise.all([
+                supabase.from('categories').select('*').order('name'),
+                supabase.from('products').select('*, categories(name)').order('created_at', { ascending: false })
+            ]);
+            if (catRes.data) setCategories(catRes.data);
+            if (prodRes.data) setProducts(prodRes.data);
         } catch (error: any) { alert(`Erreur: ${error.message}`); }
         finally { setIsLoading(false); }
     };
 
     const handleDeleteProduct = async (id: string) => {
-        if (!confirm(t.admin.deleteConfirm)) return;
+        if (!confirm(t('admin.deleteConfirm'))) return;
         try {
             const { error } = await supabase.from('products').delete().eq('id', id);
             if (error) throw error;
@@ -151,12 +156,12 @@ const AdminDashboard: React.FC = () => {
         } catch { alert('Erreur lors de la suppression'); }
     };
 
-    const startEdit = (product: ProductData) => {
+    const startEdit = (product: any) => {
         setIsEditing(true); setEditId(product.id);
         setFormData({
             name: product.name, category_id: product.category_id || '', price: product.price.toString(),
             description: product.description, producer: product.producer,
-            isOrganic: product.isOrganic, isArtisanal: product.isArtisanal, image: product.image
+            isOrganic: product.is_organic, isArtisanal: product.is_artisanal, image: product.image
         });
     };
 
@@ -180,13 +185,15 @@ const AdminDashboard: React.FC = () => {
             }
             setIsEditingCategory(false); setEditCategoryId(null);
             setCatName(''); setCatSlug(''); setCatImage('');
-            setActiveTab(activeTab);
+            // Refresh categories
+            const { data: catRes } = await supabase.from('categories').select('*').order('name');
+            if (catRes) setCategories(catRes);
         } catch (error: any) { alert(`Erreur: ${error.message}`); }
         finally { setIsLoading(false); }
     };
 
     const handleDeleteCategory = async (id: string) => {
-        if (!confirm(t.admin.deleteConfirm)) return;
+        if (!confirm(t('admin.deleteConfirm'))) return;
         try {
             const { error } = await supabase.from('categories').delete().eq('id', id);
             if (error) throw error;
@@ -203,11 +210,11 @@ const AdminDashboard: React.FC = () => {
         try {
             const { error } = await supabase.from('orders').update({ status }).eq('id', id);
             if (error) throw error;
-            setActiveTab(activeTab);
+            const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+            if (data) setOrders(data);
         } catch { alert('Erreur mise à jour'); }
     };
 
-    const getCategoryName = (id: string) => categories.find(c => c.id === id)?.name || '—';
     const statusColors: Record<string, string> = {
         pending: 'bg-yellow-100 text-yellow-800',
         confirmed: 'bg-blue-100 text-blue-800',
@@ -229,19 +236,19 @@ const AdminDashboard: React.FC = () => {
                     <div className="flex items-center gap-3">
                         <RahiqLogo className="w-12 h-12" showText={false} />
                         <div>
-                            <h1 className="text-xl font-bold text-amber-900">{t.admin.title}</h1>
+                            <h1 className="text-xl font-bold text-amber-900">{t('admin.title')}</h1>
                             <p className="text-xs text-amber-600">{user?.email}</p>
                         </div>
                     </div>
-                    <button onClick={() => navigate('/')} className="text-sm text-amber-700 hover:underline">← {t.nav.home}</button>
+                    <button onClick={() => navigate('/')} className="text-sm text-amber-700 hover:underline">← {t('nav.home')}</button>
                 </div>
 
                 {/* Tabs */}
                 <div className="flex gap-1 bg-white rounded-2xl p-1.5 mb-6 shadow-sm border border-amber-100 overflow-x-auto">
                     {[
-                        { key: 'products', label: t.admin.tabProducts, icon: <ShoppingBag size={16} /> },
-                        { key: 'categories', label: t.admin.tabCategories, icon: <FolderOpen size={16} /> },
-                        { key: 'orders', label: t.admin.tabOrders, icon: <Package size={16} /> },
+                        { key: 'products', label: t('admin.tabProducts'), icon: <ShoppingBag size={16} /> },
+                        { key: 'categories', label: t('admin.tabCategories'), icon: <FolderOpen size={16} /> },
+                        { key: 'orders', label: t('admin.tabOrders'), icon: <Package size={16} /> },
                     ].map(tab => (
                         <button key={tab.key} onClick={() => setActiveTab(tab.key as any)}
                             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors flex-shrink-0 ${activeTab === tab.key ? 'bg-amber-600 text-white' : 'text-amber-700 hover:bg-amber-50'}`}>
@@ -256,49 +263,49 @@ const AdminDashboard: React.FC = () => {
                         {/* Product Form */}
                         <div className="bg-white rounded-2xl p-5 shadow-sm border border-amber-100">
                             <h2 className="text-base font-bold text-amber-900 mb-4">
-                                {isEditing ? t.admin.editProduct : t.admin.addProduct}
+                                {isEditing ? t('admin.editProduct') : t('admin.addProduct')}
                             </h2>
                             <form onSubmit={handleSubmitProduct} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t.admin.name}</label>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.name')}</label>
                                     <input value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))} required
                                         className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t.admin.category}</label>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.category')}</label>
                                     <select value={formData.category_id}
                                         onChange={e => setFormData(p => ({ ...p, category_id: e.target.value }))}
                                         required
                                         className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400 bg-white">
-                                        <option value="">— {t.admin.category} —</option>
+                                        <option value="">— {t('admin.category')} —</option>
                                         {categories.map(c => (
                                             <option key={c.id} value={c.id}>{c.name}</option>
                                         ))}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t.admin.price} (TND)</label>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.price')} (TND)</label>
                                     <input type="number" step="0.01" value={formData.price}
                                         onChange={e => setFormData(p => ({ ...p, price: e.target.value }))} required
                                         className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t.admin.producer}</label>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.producer')}</label>
                                     <input value={formData.producer}
                                         onChange={e => setFormData(p => ({ ...p, producer: e.target.value }))} required
                                         className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t.admin.description}</label>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.description')}</label>
                                     <textarea value={formData.description}
                                         onChange={e => setFormData(p => ({ ...p, description: e.target.value }))} rows={3}
                                         className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t.admin.image}</label>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.image')}</label>
                                     <div className="flex items-center gap-3">
                                         <label className="cursor-pointer flex items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-700 px-4 py-2.5 rounded-xl text-sm font-medium">
-                                            <Upload size={16} />{uploading ? t.common.loading : t.admin.uploadImage}
+                                            <Upload size={16} />{uploading ? t('common.loading') : t('admin.uploadImage')}
                                             <input type="file" accept="image/*" className="hidden"
                                                 onChange={e => handleImageUpload(e, 'product')} disabled={uploading} />
                                         </label>
@@ -309,23 +316,23 @@ const AdminDashboard: React.FC = () => {
                                     <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                                         <input type="checkbox" checked={formData.isOrganic}
                                             onChange={e => setFormData(p => ({ ...p, isOrganic: e.target.checked }))}
-                                            className="w-4 h-4 accent-amber-600" />{t.admin.organic}
+                                            className="w-4 h-4 accent-amber-600" />{t('admin.organic')}
                                     </label>
                                     <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                                         <input type="checkbox" checked={formData.isArtisanal}
                                             onChange={e => setFormData(p => ({ ...p, isArtisanal: e.target.checked }))}
-                                            className="w-4 h-4 accent-amber-600" />{t.admin.artisanal}
+                                            className="w-4 h-4 accent-amber-600" />{t('admin.artisanal')}
                                     </label>
                                 </div>
                                 <div className="flex gap-2 md:col-span-2">
                                     <button type="submit" disabled={isLoading}
                                         className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2">
-                                        {isLoading ? <Loader className="animate-spin" size={16} /> : <CheckCircle size={16} />}{t.admin.save}
+                                        {isLoading ? <Loader className="animate-spin" size={16} /> : <CheckCircle size={16} />}{t('admin.save')}
                                     </button>
                                     {isEditing && (
                                         <button type="button" onClick={cancelEdit}
                                             className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-6 py-2.5 rounded-xl text-sm font-medium">
-                                            {t.admin.cancel}
+                                            {t('admin.cancel')}
                                         </button>
                                     )}
                                 </div>
@@ -335,32 +342,32 @@ const AdminDashboard: React.FC = () => {
                         {/* Products List */}
                         <div className="bg-white rounded-2xl shadow-sm border border-amber-100 overflow-hidden">
                             <div className="px-5 py-3 border-b border-amber-100">
-                                <h3 className="font-semibold text-amber-900">{products.length} {t.admin.products.toLowerCase()}</h3>
+                                <h3 className="font-semibold text-amber-900">{products.length} {t('admin.products').toLowerCase()}</h3>
                             </div>
                             {products.length === 0 ? (
-                                <div className="p-8 text-center text-gray-400">{t.admin.noProducts}</div>
+                                <div className="p-8 text-center text-gray-400">{t('admin.noProducts')}</div>
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-sm">
                                         <thead className="bg-amber-50">
                                             <tr>
-                                                <th className="text-left px-5 py-3 font-semibold text-amber-800">{t.admin.image}</th>
-                                                <th className="text-left px-3 py-3 font-semibold text-amber-800">{t.admin.name}</th>
-                                                <th className="text-left px-3 py-3 font-semibold text-amber-800">{t.admin.category}</th>
-                                                <th className="text-left px-3 py-3 font-semibold text-amber-800">{t.admin.price}</th>
+                                                <th className="text-left px-5 py-3 font-semibold text-amber-800">{t('admin.image')}</th>
+                                                <th className="text-left px-3 py-3 font-semibold text-amber-800">{t('admin.name')}</th>
+                                                <th className="text-left px-3 py-3 font-semibold text-amber-800">{t('admin.category')}</th>
+                                                <th className="text-left px-3 py-3 font-semibold text-amber-800">{t('admin.price')}</th>
                                                 <th className="text-right px-5 py-3 font-semibold text-amber-800"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {(products as any[]).map(p => (
+                                            {products.map(p => (
                                                 <tr key={p.id} className="border-t border-amber-50 hover:bg-amber-50/50">
                                                     <td className="px-5 py-3"><img src={p.image} alt={p.name} className="h-10 w-10 object-cover rounded-lg" /></td>
                                                     <td className="px-3 py-3 font-medium text-amber-900">{p.name}</td>
-                                                    <td className="px-3 py-3 text-gray-600 text-xs">{p.categories?.name || '—'}</td>
+                                                    <td className="px-3 py-3 text-gray-600 text-xs">{(p as any).categories?.name || '—'}</td>
                                                     <td className="px-3 py-3 font-semibold text-amber-800">{p.price} TND</td>
                                                     <td className="px-5 py-3">
                                                         <div className="flex gap-1 justify-end">
-                                                            <button onClick={() => startEdit(p as any)} className="p-2 text-amber-600 hover:bg-amber-100 rounded-lg"><Edit2 size={16} /></button>
+                                                            <button onClick={() => startEdit(p)} className="p-2 text-amber-600 hover:bg-amber-100 rounded-lg"><Edit2 size={16} /></button>
                                                             <button onClick={() => handleDeleteProduct(p.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
                                                         </div>
                                                     </td>
@@ -378,10 +385,10 @@ const AdminDashboard: React.FC = () => {
                 {activeTab === 'categories' && (
                     <div className="space-y-4">
                         <div className="bg-white rounded-2xl p-5 shadow-sm border border-amber-100">
-                            <h2 className="text-base font-bold text-amber-900 mb-4">{isEditingCategory ? t.admin.editCategory : t.admin.addCategory}</h2>
+                            <h2 className="text-base font-bold text-amber-900 mb-4">{isEditingCategory ? t('admin.editCategory') : t('admin.addCategory')}</h2>
                             <form onSubmit={handleSubmitCategory} className="flex flex-col md:flex-row gap-3 items-end">
                                 <div className="flex-1">
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t.admin.categoryName}</label>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.categoryName')}</label>
                                     <input value={catName}
                                         onChange={e => { setCatName(e.target.value); setCatSlug(slugify(e.target.value)); }}
                                         required placeholder="Ex: Miel de Thym"
@@ -396,7 +403,7 @@ const AdminDashboard: React.FC = () => {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <label className="cursor-pointer flex items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-700 px-4 py-2.5 rounded-xl text-sm font-medium">
-                                        <Upload size={16} />{t.admin.selectImage}
+                                        <Upload size={16} />{t('admin.selectImage')}
                                         <input type="file" accept="image/*" className="hidden"
                                             onChange={e => handleImageUpload(e, 'category')} />
                                     </label>
@@ -404,18 +411,18 @@ const AdminDashboard: React.FC = () => {
                                 </div>
                                 <button type="submit" disabled={isLoading}
                                     className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2">
-                                    {isLoading ? <Loader className="animate-spin" size={16} /> : <CheckCircle size={16} />}{t.admin.save}
+                                    {isLoading ? <Loader className="animate-spin" size={16} /> : <CheckCircle size={16} />}{t('admin.save')}
                                 </button>
                                 {isEditingCategory && (
                                     <button type="button" onClick={() => { setIsEditingCategory(false); setCatName(''); setCatSlug(''); setCatImage(''); }}
-                                        className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-6 py-2.5 rounded-xl text-sm font-medium">{t.admin.cancel}</button>
+                                        className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-6 py-2.5 rounded-xl text-sm font-medium">{t('admin.cancel')}</button>
                                 )}
                             </form>
                         </div>
 
                         <div className="bg-white rounded-2xl shadow-sm border border-amber-100 overflow-hidden">
                             {categories.length === 0 ? (
-                                <div className="p-8 text-center text-gray-400">{t.admin.noCategories}</div>
+                                <div className="p-8 text-center text-gray-400">{t('admin.noCategories')}</div>
                             ) : (
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
                                     {categories.map(cat => (
@@ -439,12 +446,12 @@ const AdminDashboard: React.FC = () => {
                 {activeTab === 'orders' && (
                     <div className="space-y-3">
                         {orders.length === 0 ? (
-                            <div className="bg-white rounded-2xl p-8 text-center text-gray-400 shadow-sm border border-amber-100">{t.admin.noOrders}</div>
+                            <div className="bg-white rounded-2xl p-8 text-center text-gray-400 shadow-sm border border-amber-100">{t('admin.noOrders')}</div>
                         ) : orders.map(order => (
                             <div key={order.id} className="bg-white rounded-2xl p-4 shadow-sm border border-amber-100">
                                 <div className="flex justify-between items-start mb-3">
                                     <div>
-                                        <p className="font-bold text-amber-900 text-sm">{t.admin.orderFor}: {order.customer_name}</p>
+                                        <p className="font-bold text-amber-900 text-sm">{t('admin.orderFor')}: {order.customer_name}</p>
                                         <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
                                             <span className="flex items-center gap-1"><Mail size={12} />{order.customer_email}</span>
                                             <span className="flex items-center gap-1"><Phone size={12} />{order.customer_phone}</span>
@@ -456,7 +463,7 @@ const AdminDashboard: React.FC = () => {
                                     </div>
                                     <div className="flex flex-col items-end gap-2">
                                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusColors[order.status] || statusColors.pending}`}>
-                                            {t.admin.status[order.status as keyof typeof t.admin.status] || order.status}
+                                            {t(`admin.status.${order.status}`) || order.status}
                                         </span>
                                         <span className="text-sm font-bold text-amber-800">{order.total} TND</span>
                                     </div>
@@ -473,7 +480,7 @@ const AdminDashboard: React.FC = () => {
                                     {['pending', 'confirmed', 'delivered', 'cancelled'].map(s => (
                                         <button key={s} onClick={() => updateOrderStatus(order.id, s)}
                                             className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${order.status === s ? 'bg-amber-600 text-white' : 'bg-amber-50 text-amber-700 hover:bg-amber-100'}`}>
-                                            {t.admin.status[s as keyof typeof t.admin.status]}
+                                            {t(`admin.status.${s}`)}
                                         </button>
                                     ))}
                                 </div>
