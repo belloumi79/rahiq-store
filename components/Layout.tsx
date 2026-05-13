@@ -77,6 +77,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </motion.a>
               </div>
               <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>
+              
+              {/* Auth Link */}
+              <Link 
+                to={user ? '/profile' : '/login'} 
+                className={`nav-link flex items-center gap-2 group ${location.pathname === (user ? '/profile' : '/login') ? 'nav-link-active' : ''}`}
+              >
+                <motion.span whileHover={{ y: -2 }} className="text-amber-500 group-hover:text-amber-600">
+                  <User size={18} />
+                </motion.span>
+                <span className="hidden lg:inline">{user ? t('nav.profile') : t('nav.login')}</span>
+              </Link>
+
               <LanguageSwitcher />
               <motion.button 
                 whileTap={{ scale: 0.9 }}
