@@ -97,6 +97,8 @@ export default {
     noAccount: "Don't have an account? Sign up",
     hasAccount: 'Already have an account? Sign in',
     signUp: 'Sign Up',
+    or: 'or',
+    guest: 'Continue as guest',
   },
   admin: {
     title: 'Dashboard',
@@ -148,6 +150,6 @@ export default {
     close: 'Close',
     confirm: 'Confirm',
     cancel: 'Cancel',
-    TND: 'TND',
+    currency: 'TND',
   },
 };

@@ -4,7 +4,7 @@ import { ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { fetchProducts, fetchCategories } from '../lib/supabase';
-import type { Product } from '../lib/supabase';
+import type { Product } from '../types';
 import ProductCard from '../components/ProductCard';
 
 const Marketplace: React.FC = () => {

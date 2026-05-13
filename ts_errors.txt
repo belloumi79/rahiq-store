@@ -1,0 +1,24 @@
+i18n.ts(22,60): error TS2719: Type '{ nav: { home: string; marketplace: string; cart: string; account: string; admin: string; orders: string; login: string; logout: string; }; home: { heroTitle: string; heroSub: string; cta: string; categories: string; ... 5 more ...; fromTunisia: string; }; ... 8 more ...; common: { ...; }; }' is not assignable to type '{ nav: { home: string; marketplace: string; cart: string; account: string; admin: string; orders: string; login: string; logout: string; }; home: { heroTitle: string; heroSub: string; cta: string; categories: string; ... 5 more ...; fromTunisia: string; }; ... 8 more ...; common: { ...; }; }'. Two different types with this name exist, but they are unrelated.
+  Types of property 'login' are incompatible.
+    Type '{ welcome: string; loginSub: string; email: string; password: string; submit: string; noAccount: string; hasAccount: string; signUp: string; }' is missing the following properties from type '{ welcome: string; loginSub: string; email: string; password: string; submit: string; noAccount: string; hasAccount: string; signUp: string; or: string; guest: string; }': or, guest
+i18n.ts(22,64): error TS2719: Type '{ nav: { home: string; marketplace: string; cart: string; account: string; admin: string; orders: string; login: string; logout: string; }; home: { heroTitle: string; heroSub: string; cta: string; categories: string; ... 5 more ...; fromTunisia: string; }; ... 8 more ...; common: { ...; }; }' is not assignable to type '{ nav: { home: string; marketplace: string; cart: string; account: string; admin: string; orders: string; login: string; logout: string; }; home: { heroTitle: string; heroSub: string; cta: string; categories: string; ... 5 more ...; fromTunisia: string; }; ... 8 more ...; common: { ...; }; }'. Two different types with this name exist, but they are unrelated.
+  Types of property 'login' are incompatible.
+    Type '{ welcome: string; loginSub: string; email: string; password: string; submit: string; noAccount: string; hasAccount: string; signUp: string; }' is missing the following properties from type '{ welcome: string; loginSub: string; email: string; password: string; submit: string; noAccount: string; hasAccount: string; signUp: string; or: string; guest: string; }': or, guest
+lib/supabase.ts(3,33): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+lib/supabase.ts(4,33): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+pages/AdminDashboard.tsx(159,32): error TS2551: Property 'isOrganic' does not exist on type 'ProductData'. Did you mean 'is_organic'?
+pages/AdminDashboard.tsx(159,64): error TS2551: Property 'isArtisanal' does not exist on type 'ProductData'. Did you mean 'is_artisanal'?
+pages/Marketplace.tsx(7,15): error TS2614: Module '"../lib/supabase"' has no exported member 'Product'. Did you mean to use 'import Product from "../lib/supabase"' instead?
+pages/Orders.tsx(35,68): error TS2554: Expected 2 arguments, but got 1.
+pages/Orders.tsx(40,75): error TS2554: Expected 2 arguments, but got 1.
+pages/Orders.tsx(41,65): error TS2554: Expected 2 arguments, but got 1.
+pages/Orders.tsx(43,26): error TS2554: Expected 2 arguments, but got 1.
+pages/Orders.tsx(56,38): error TS2554: Expected 2 arguments, but got 1.
+pages/ProductDetails.tsx(24,14): error TS2339: Property 'finally' does not exist on type 'PromiseLike<void>'.
+pages/Profile.tsx(25,68): error TS2554: Expected 2 arguments, but got 1.
+pages/Profile.tsx(28,88): error TS2554: Expected 2 arguments, but got 1.
+pages/Profile.tsx(32,88): error TS2554: Expected 2 arguments, but got 1.
+pages/Profile.tsx(36,88): error TS2554: Expected 2 arguments, but got 1.
+pages/Profile.tsx(40,88): error TS2554: Expected 2 arguments, but got 1.
+pages/Profile.tsx(44,53): error TS2554: Expected 2 arguments, but got 1.
+pages/Profile.tsx(44,78): error TS2554: Expected 2 arguments, but got 1.

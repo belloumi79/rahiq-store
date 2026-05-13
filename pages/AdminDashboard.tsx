@@ -156,7 +156,7 @@ const AdminDashboard: React.FC = () => {
         setFormData({
             name: product.name, category_id: product.category_id || '', price: product.price.toString(),
             description: product.description, producer: product.producer,
-            isOrganic: product.isOrganic, isArtisanal: product.isArtisanal, image: product.image
+            isOrganic: product.is_organic, isArtisanal: product.is_artisanal, image: product.image
         });
     };
 

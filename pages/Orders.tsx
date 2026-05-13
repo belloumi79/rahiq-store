@@ -4,11 +4,10 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import supabase from '../lib/supabase';
 import { Package, ShoppingBag, Phone, MapPin } from 'lucide-react';
-import { t } from '../i18n';
 
 const Orders: React.FC = () => {
     const { user } = useAuth();
-    const { dir } = useLanguage();
+    const { dir, t } = useLanguage();
     const navigate = useNavigate();
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -32,15 +31,15 @@ const Orders: React.FC = () => {
 
     return (
         <div className="px-4 py-4" dir={dir}>
-            <h1 className="text-xl font-bold text-amber-900 mb-6">{t('orders.title')}</h1>
+            <h1 className="text-xl font-bold text-amber-900 mb-6">{t.orders.title}</h1>
 
             {orders.length === 0 ? (
                 <div className="text-center py-16">
                     <Package size={56} className="mx-auto text-amber-200 mb-4" />
-                    <p className="text-amber-700 font-bold text-lg mb-2">{t('orders.empty')}</p>
-                    <p className="text-amber-500 text-sm mb-6">{t('orders.emptySub')}</p>
+                    <p className="text-amber-700 font-bold text-lg mb-2">{t.orders.empty}</p>
+                    <p className="text-amber-500 text-sm mb-6">{t.orders.emptySub}</p>
                     <button onClick={() => navigate('/marketplace')} className="bg-amber-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-amber-700 transition-colors">
-                        {t('orders.discover')}
+                        {t.orders.discover}
                     </button>
                 </div>
             ) : (
@@ -53,7 +52,7 @@ const Orders: React.FC = () => {
                                     <p className="text-xs text-gray-400">{new Date(order.created_at).toLocaleDateString()}</p>
                                 </div>
                                 <span className={`text-xs font-bold px-3 py-1 rounded-full ${statusColor(order.status)}`}>
-                                    {t(`orders.status.${order.status}` as any) || order.status}
+                                    {(t.orders.status as any)[order.status] || order.status}
                                 </span>
                             </div>
                             <p className="text-sm text-gray-600 mb-2">{order.items}</p>

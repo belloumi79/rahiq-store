@@ -97,6 +97,8 @@ export default {
     noAccount: 'ليس لديك حساب؟ سجل الآن',
     hasAccount: 'لديك حساب؟ سجل الدخول',
     signUp: 'سجل الآن',
+    or: 'أو',
+    guest: 'المتابعة كضيف',
   },
   admin: {
     title: 'لوحة التحكم',
@@ -148,6 +150,6 @@ export default {
     close: 'إغلاق',
     confirm: 'تأكيد',
     cancel: 'إلغاء',
-    TND: 'د.ت',
+    currency: 'د.ت',
   },
 };

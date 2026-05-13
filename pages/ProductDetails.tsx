@@ -17,11 +17,17 @@ const ProductDetails: React.FC = () => {
 
     useEffect(() => {
         if (!id) return;
-        supabase
-            .from('products').select('*, categories(name,image,slug)')
-            .eq('id', id).single()
-            .then(({ data }) => { if (data) setProduct(mapProductFromSupabase(data)); })
-            .finally(() => setLoading(false));
+        const fetchProduct = async () => {
+            try {
+                const { data } = await supabase
+                    .from('products').select('*, categories(name,image,slug)')
+                    .eq('id', id).single();
+                if (data) setProduct(mapProductFromSupabase(data));
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProduct();
     }, [id]);
 
     if (loading) return (
