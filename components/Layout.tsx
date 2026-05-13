@@ -123,36 +123,90 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Page Content */}
       <main className="pt-4">{children}</main>
 
-      {/* Footer */}
-      <footer className="bg-amber-900 text-amber-100 mt-12">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-            <div>
-              <div className="font-bold text-amber-50 text-lg mb-2">🍯 Rahiq Store</div>
-              <p>{t('footer.about') || 'Votre miel 100% Tunisien, naturel et authentique.'}</p>
-            </div>
-            <div>
-              <div className="font-semibold text-amber-50 mb-2">{t('footer.links') || 'Liens'}</div>
-              <div className="space-y-1">
-                <Link to="/" className="block hover:text-white">{t('nav.home')}</Link>
-                <Link to="/marketplace" className="block hover:text-white">{t('nav.marketplace')}</Link>
-                <Link to="/cart" className="block hover:text-white">{t('nav.cart')}</Link>
+      {/* Premium Footer */}
+      <footer className="relative mt-24 pb-12 overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-200 to-transparent" />
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-amber-100/50 rounded-full blur-3xl -z-10" />
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-orange-50/50 rounded-full blur-3xl -z-10" />
+
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="glass-card rounded-[3rem] p-12 shadow-xl border-white/40 bg-white/30 backdrop-blur-xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+              {/* Brand Section */}
+              <div className="space-y-6 lg:col-span-1">
+                <Link to="/" className="flex items-center gap-2">
+                  <span className="text-3xl">🍯</span>
+                  <span className="font-black text-2xl bg-gradient-to-r from-amber-800 to-amber-600 bg-clip-text text-transparent">
+                    Rahiq Store
+                  </span>
+                </Link>
+                <p className="text-slate-500 text-sm font-medium leading-relaxed">
+                  {t('footer.about')}
+                </p>
+                <div className="flex gap-4 pt-2">
+                  <motion.a whileHover={{ scale: 1.1, y: -2 }} href="https://www.instagram.com/errahik.gammoudi" target="_blank" className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-pink-500 flex items-center justify-center text-white shadow-lg">
+                    <Instagram size={20} />
+                  </motion.a>
+                  <motion.a whileHover={{ scale: 1.1, y: -2 }} href="https://www.tiktok.com/@errahik27152001" target="_blank" className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white shadow-lg">
+                    <span className="text-lg">🎵</span>
+                  </motion.a>
+                </div>
+              </div>
+
+              {/* Links Section */}
+              <div className="space-y-6">
+                <h4 className="font-black text-slate-800 uppercase tracking-widest text-xs">{t('footer.links')}</h4>
+                <ul className="space-y-4">
+                  {[
+                    { to: '/', label: t('nav.home') },
+                    { to: '/marketplace', label: t('nav.marketplace') },
+                    { to: '/cart', label: t('nav.cart') },
+                  ].map(link => (
+                    <li key={link.to}>
+                      <Link to={link.to} className="text-slate-500 hover:text-amber-600 font-bold text-sm transition-colors flex items-center gap-2 group">
+                        <span className="w-1 h-1 rounded-full bg-amber-400 opacity-0 group-hover:opacity-100 transition-all" />
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Support Section */}
+              <div className="space-y-6">
+                <h4 className="font-black text-slate-800 uppercase tracking-widest text-xs">{t('footer.support')}</h4>
+                <ul className="space-y-4">
+                  <li>
+                    <a href="tel:+216" className="text-slate-500 hover:text-amber-600 font-bold text-sm transition-colors">
+                      {t('footer.contact')}
+                    </a>
+                  </li>
+                  <li>
+                    <p className="text-slate-400 text-xs font-bold mt-2 italic">Tunisia, 2025</p>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Newsletter (Visual Only) */}
+              <div className="space-y-6">
+                <h4 className="font-black text-slate-800 uppercase tracking-widest text-xs">NEWSLETTER</h4>
+                <div className="relative">
+                  <input type="email" placeholder="Email..." className="w-full bg-white/50 border-2 border-amber-100 rounded-2xl py-3 px-4 text-sm font-bold focus:outline-none focus:border-amber-400 transition-all" />
+                  <button className="absolute right-2 top-2 bottom-2 px-4 bg-amber-600 text-white rounded-xl text-xs font-black shadow-lg shadow-amber-200">OK</button>
+                </div>
               </div>
             </div>
-            <div>
-              <div className="font-semibold text-amber-50 mb-2">{t('footer.follow') || 'Suivez-nous'}</div>
-              <div className="flex gap-3">
-                <a href="https://www.instagram.com/errahik.gammoudi" target="_blank" rel="noreferrer" className="hover:text-pink-400">
-                  <Instagram size={20} />
-                </a>
-                <a href="https://www.tiktok.com/@errahik27152001" target="_blank" rel="noreferrer" className="hover:text-white">
-                  🎵 TikTok
-                </a>
+
+            {/* Bottom Bar */}
+            <div className="mt-16 pt-8 border-t border-amber-100/50 flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-slate-400 text-xs font-bold">
+                © 2025 Rahiq Store. {t('footer.rights')}
+              </p>
+              <div className="flex gap-6">
+                <span className="text-[10px] font-black text-slate-300 tracking-tighter uppercase">MADE WITH 🍯 IN TUNISIA</span>
               </div>
             </div>
-          </div>
-          <div className="text-center mt-6 pt-4 border-t border-amber-800 text-xs">
-            © 2025 Rahiq Store. {t('footer.rights') || 'Tous droits réservés.'}
           </div>
         </div>
       </footer>

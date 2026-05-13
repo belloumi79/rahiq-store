@@ -81,12 +81,14 @@ export default {
     price: 'Prix',
     new: 'Nouveau',
   },
-  admin: {
-    status: {
-      pending: 'En Attente',
-      confirmed: 'Confirmée',
-      delivered: 'Livrée',
-      cancelled: 'Annulée',
-    }
+    },
+  },
+  footer: {
+    about: 'Votre miel 100% Tunisien, naturel et authentique. Le meilleur de nos ruches directement chez vous.',
+    links: 'Liens Rapides',
+    follow: 'Suivez-nous',
+    rights: 'Tous droits réservés.',
+    contact: 'Contact',
+    support: 'Support Client',
   }
 };

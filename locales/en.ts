@@ -87,6 +87,14 @@ export default {
       confirmed: 'Confirmed',
       delivered: 'Delivered',
       cancelled: 'Cancelled',
-    }
+    },
+  },
+  footer: {
+    about: 'Your 100% Tunisian honey, natural and authentic. We bring you the best of our hives directly to your home.',
+    links: 'Quick Links',
+    follow: 'Follow Us',
+    rights: 'All rights reserved.',
+    contact: 'Contact',
+    support: 'Customer Support',
   }
 };
