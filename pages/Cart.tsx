@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 import { Trash2, ShoppingBag } from 'lucide-react';
 
 const Cart: React.FC = () => {
-    const { items, removeFromCart, updateQuantity, clearCart, total } = useCart();
+    const { items, removeFromCart, updateQuantity, clearCart, cartTotal } = useCart();
     const { dir, t } = useLanguage();
     const navigate = useNavigate();
 
@@ -53,7 +53,7 @@ const Cart: React.FC = () => {
                     <div className="mt-4 bg-white rounded-2xl p-4 shadow-sm border border-amber-100">
                         <div className="flex justify-between items-center">
                             <span className="font-bold text-amber-900">{t.cart.total}</span>
-                            <span className="text-2xl font-bold text-amber-800">{total.toFixed(2)} {t.cart.currency}</span>
+                            <span className="text-2xl font-bold text-amber-800">{cartTotal.toFixed(2)} {t.cart.currency}</span>
                         </div>
                     </div>
 
