@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, ShoppingCart, Star, ShieldCheck, Truck, Award, Heart, Plus, Minus, Loader } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import supabase, { mapProductFromSupabase } from '../lib/supabase';
 import { Product } from '../types';
-import { ArrowLeft, ShoppingBag, Leaf, Award, CheckCircle, Loader } from 'lucide-react';
 
 const ProductDetails: React.FC = () => {
     const { id } = useParams();
@@ -30,6 +31,13 @@ const ProductDetails: React.FC = () => {
         fetchProduct();
     }, [id]);
 
+    const handleAddToCart = () => {
+        if (product) {
+            addToCart({ ...product, quantity });
+            navigate('/cart');
+        }
+    };
+
     if (loading) return (
         <div dir={dir} className="flex justify-center items-center h-64">
             <Loader className="animate-spin text-amber-600" size={32} />
@@ -37,86 +45,119 @@ const ProductDetails: React.FC = () => {
     );
 
     if (!product) return (
-        <div dir={dir} className="text-center py-16 text-gray-400">{t.marketplace.noProducts}</div>
+        <div dir={dir} className="text-center py-16 text-gray-400">{t('marketplace.noProducts')}</div>
     );
 
     return (
-        <div dir={dir} className="min-h-screen bg-amber-50">
-            <div className="max-w-4xl mx-auto px-3 py-4">
-                <button onClick={() => navigate(-1)}
-                    className="flex items-center gap-1 text-amber-700 text-sm font-medium mb-4 hover:underline">
-                    <ArrowLeft size={16} />{t.common.back}
-                </button>
-                <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-amber-100">
-                    <div className="grid md:grid-cols-2">
-                        <div className="aspect-square bg-amber-100">
-                            {product.image ? (
-                                <img src={product.image} alt={product.name}
-                                    className="w-full h-full object-cover" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-amber-300">
-                                    <ShoppingBag size={64} />
-                                </div>
-                            )}
-                        </div>
-                        <div className="p-6 flex flex-col">
-                            <div className="flex-1">
-                                {product.category && (
-                                    <span className="text-xs font-semibold text-amber-500 uppercase tracking-wide">
-                                        {(product as any).categories?.name || product.category}
-                                    </span>
-                                )}
-                                <h1 className="text-2xl font-bold text-amber-900 mt-1 mb-3">{product.name}</h1>
-                                {product.producer && (
-                                    <p className="text-sm text-gray-500 mb-3">🏺 {product.producer}</p>
-                                )}
-                                <div className="flex gap-2 mb-4">
-                                    {product.isOrganic && (
-                                        <span className="flex items-center gap-1 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">
-                                            <Leaf size={12} />{t.product.organic}
-                                        </span>
-                                    )}
-                                    {product.isArtisanal && (
-                                        <span className="flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-medium">
-                                            <Award size={12} />{t.product.artisanal}
-                                        </span>
-                                    )}
-                                </div>
-                                {product.description && (
-                                    <p className="text-gray-600 text-sm leading-relaxed mb-4">{product.description}</p>
-                                )}
-                                {product.benefits && product.benefits.length > 0 && (
-                                    <div className="mb-4">
-                                        <h3 className="text-sm font-bold text-amber-800 mb-2">{t.product.benefits}</h3>
-                                        <ul className="space-y-1">
-                                            {product.benefits.map((b, i) => (
-                                                <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <CheckCircle size={14} className="text-green-500 flex-shrink-0" />{b}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="border-t border-amber-100 pt-4">
-                                <div className="flex items-center justify-between mb-4">
-                                    <span className="text-3xl font-bold text-amber-700">{product.price} <span className="text-lg">TND</span></span>
-                                    <div className="flex items-center gap-2 bg-amber-50 rounded-xl px-1">
-                                        <button onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                                            className="w-8 h-8 flex items-center justify-center text-amber-700 font-bold text-lg hover:bg-amber-100 rounded-lg">−</button>
-                                        <span className="w-8 text-center font-bold text-amber-900">{quantity}</span>
-                                        <button onClick={() => setQuantity(q => q + 1)}
-                                            className="w-8 h-8 flex items-center justify-center text-amber-700 font-bold text-lg hover:bg-amber-100 rounded-lg">+</button>
-                                    </div>
-                                </div>
-                                <button onClick={() => { addToCart({ ...product, quantity }); navigate('/cart'); }}
-                                    className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-colors">
-                                    <ShoppingBag size={18} />{t.product.addToCart}
-                                </button>
-                            </div>
+        <div dir={dir} className="max-w-6xl mx-auto px-4 py-8">
+            <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 text-slate-500 hover:text-amber-600 font-bold transition-colors mb-8 group"
+            >
+                <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> {t('common.back')}
+            </button>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
+                <motion.div 
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="space-y-6"
+                >
+                    <div className="aspect-square rounded-[3rem] overflow-hidden shadow-2xl shadow-amber-900/10 border border-amber-50">
+                        <img 
+                            src={product.image} 
+                            alt={product.name} 
+                            className="w-full h-full object-cover" 
+                        />
+                    </div>
+                    
+                    <div className="flex gap-4">
+                        <div className="w-24 h-24 rounded-2xl border-2 border-amber-500 overflow-hidden cursor-pointer">
+                            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                         </div>
                     </div>
-                </div>
+                </motion.div>
+
+                <motion.div 
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex flex-col"
+                >
+                    <div className="flex items-center gap-4 mb-4">
+                        <span className="px-4 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold uppercase tracking-widest">
+                            {product.category || 'Miel'}
+                        </span>
+                        <div className="flex items-center gap-1 text-amber-400">
+                            <Star size={16} fill="currentColor" />
+                            <span className="text-slate-900 font-bold">4.9</span>
+                            <span className="text-slate-400 font-medium">(120+ {t('product.reviews')})</span>
+                        </div>
+                    </div>
+
+                    <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 leading-tight">
+                        {product.name}
+                    </h1>
+
+                    <div className="flex items-center gap-4 mb-8">
+                        <p className="text-4xl font-black text-amber-600">
+                            {product.price} <span className="text-xl font-bold">{t('common.currency')}</span>
+                        </p>
+                        <div className="h-8 w-px bg-slate-200"></div>
+                        <p className="text-green-600 font-bold flex items-center gap-1">
+                            <ShieldCheck size={18} /> {t('product.inStock')}
+                        </p>
+                    </div>
+
+                    <p className="text-lg text-slate-600 leading-relaxed mb-10">
+                        {product.description}
+                    </p>
+
+                    <div className="space-y-6 mb-12">
+                        <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl">
+                                <button 
+                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                    className="w-12 h-12 rounded-xl flex items-center justify-center hover:bg-white hover:shadow-sm transition-all"
+                                >
+                                    <Minus size={20} />
+                                </button>
+                                <span className="w-12 text-center font-bold text-lg">{quantity}</span>
+                                <button 
+                                    onClick={() => setQuantity(quantity + 1)}
+                                    className="w-12 h-12 rounded-xl flex items-center justify-center hover:bg-white hover:shadow-sm transition-all"
+                                >
+                                    <Plus size={20} />
+                                </button>
+                            </div>
+                            
+                            <button
+                                onClick={handleAddToCart}
+                                className="flex-1 bg-amber-600 text-white rounded-2xl font-bold py-4 flex items-center justify-center gap-3 hover:bg-amber-700 transition-colors"
+                            >
+                                <ShoppingCart size={24} /> {t('product.addToCart')}
+                            </button>
+
+                            <button className="w-16 h-16 rounded-2xl border border-slate-200 flex items-center justify-center hover:bg-pink-50 hover:border-pink-200 hover:text-pink-500 transition-all">
+                                <Heart size={24} />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        {[
+                            { icon: <Award className="text-amber-600" />, title: t('product.feat1'), desc: t('product.feat1Desc') },
+                            { icon: <Truck className="text-amber-600" />, title: t('product.feat2'), desc: t('product.feat2Desc') },
+                        ].map((feat, i) => (
+                            <div key={i} className="p-4 rounded-2xl bg-amber-50/50 border border-amber-100">
+                                <div className="flex items-center gap-3 mb-2">
+                                    {feat.icon}
+                                    <h4 className="font-bold text-amber-900 text-sm">{feat.title}</h4>
+                                </div>
+                                <p className="text-xs text-slate-500 leading-relaxed">{feat.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
             </div>
         </div>
     );

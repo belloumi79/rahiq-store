@@ -4,6 +4,7 @@ import { Home, ShoppingBag, ShoppingCart, User, Instagram, Menu, X } from 'lucid
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
@@ -14,81 +15,113 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Bar */}
-      <div className="bg-amber-600 text-white text-center py-1.5 text-sm">
-        🍯 {t('nav.promo') || 'Livraison gratuite dès 100 TND de commande'}
-      </div>
+      <motion.div 
+        initial={{ y: -50 }}
+        animate={{ y: 0 }}
+        className="bg-gradient-to-r from-amber-600 to-amber-500 text-white text-center py-2 text-sm font-medium shadow-md sticky top-0 z-[60]"
+      >
+        <span className="inline-block animate-pulse mr-2">🍯</span>
+        {t('nav.promo') || 'Livraison gratuite dès 100 TND de commande'}
+      </motion.div>
 
       {/* Navbar */}
-      <nav className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
+      <nav className="sticky top-9 z-50 px-4 py-3">
+        <div className="max-w-6xl mx-auto">
+          <div className="glass-card rounded-3xl px-6 py-3 flex items-center justify-between">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl">🍯</span>
-              <span className="font-bold text-xl text-amber-700">Rahiq Store</span>
+            <Link to="/" className="flex items-center gap-2 group">
+              <motion.span 
+                whileHover={{ rotate: 20, scale: 1.2 }}
+                className="text-2xl"
+              >
+                🍯
+              </motion.span>
+              <span className="font-extrabold text-xl bg-gradient-to-r from-amber-800 to-amber-600 bg-clip-text text-transparent">
+                Rahiq Store
+              </span>
             </Link>
 
             {/* Desktop Nav */}
-            <div className="hidden md:flex items-center gap-6">
-              <Link to="/" className={`flex items-center gap-1.5 text-sm font-medium ${location.pathname === '/' ? 'text-amber-600' : 'text-gray-600 hover:text-amber-600'}`}>
-                <Home size={16} /> {t('nav.home')}
-              </Link>
-              <Link to="/marketplace" className={`flex items-center gap-1.5 text-sm font-medium ${location.pathname === '/marketplace' ? 'text-amber-600' : 'text-gray-600 hover:text-amber-600'}`}>
-                <ShoppingBag size={16} /> {t('nav.marketplace')}
-              </Link>
-              <Link to="/cart" className={`flex items-center gap-1.5 text-sm font-medium ${location.pathname === '/cart' ? 'text-amber-600' : 'text-gray-600 hover:text-amber-600'}`}>
-                <ShoppingCart size={16} /> {t('nav.cart')}
-              </Link>
+            <div className="hidden md:flex items-center gap-8">
+              {[
+                { to: '/', label: t('nav.home'), icon: <Home size={18} /> },
+                { to: '/marketplace', label: t('nav.marketplace'), icon: <ShoppingBag size={18} /> },
+                { to: '/cart', label: t('nav.cart'), icon: <ShoppingCart size={18} /> },
+              ].map((link) => (
+                <Link 
+                  key={link.to} 
+                  to={link.to} 
+                  className={`nav-link flex items-center gap-2 group ${location.pathname === link.to ? 'nav-link-active' : ''}`}
+                >
+                  <motion.span whileHover={{ y: -2 }} className="text-amber-500 group-hover:text-amber-600">
+                    {link.icon}
+                  </motion.span>
+                  {link.label}
+                </Link>
+              ))}
               {isAdmin && (
-                <Link to="/admin" className="flex items-center gap-1.5 text-sm font-medium text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                <Link to="/admin" className="flex items-center gap-2 px-4 py-1.5 rounded-2xl bg-amber-600 text-white text-sm font-bold shadow-lg shadow-amber-200 hover:bg-amber-700 transition-all">
                   ⚙️ {t('nav.admin')}
                 </Link>
               )}
             </div>
 
             {/* Right side */}
-            <div className="flex items-center gap-3">
-              <a href="https://www.instagram.com/errahik.gammoudi" target="_blank" rel="noreferrer" className="text-gray-500 hover:text-pink-500">
-                <Instagram size={20} />
-              </a>
-              <a href="https://www.tiktok.com/@errahik27152001" target="_blank" rel="noreferrer" className="text-gray-500 hover:text-black">
-                <span style={{fontSize: 20}}>🎵</span>
-              </a>
+            <div className="flex items-center gap-4">
+              <div className="hidden sm:flex items-center gap-3">
+                <motion.a whileHover={{ scale: 1.1 }} href="https://www.instagram.com/errahik.gammoudi" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-pink-500 transition-colors">
+                  <Instagram size={20} />
+                </motion.a>
+                <motion.a whileHover={{ scale: 1.1 }} href="https://www.tiktok.com/@errahik27152001" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-black transition-colors">
+                  <span className="text-xl">🎵</span>
+                </motion.a>
+              </div>
+              <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>
               <LanguageSwitcher />
-              <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-gray-600">
+              <motion.button 
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setMenuOpen(!menuOpen)} 
+                className="md:hidden p-2 rounded-xl bg-amber-50 text-amber-700"
+              >
                 {menuOpen ? <X size={20} /> : <Menu size={20} />}
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
 
         {/* Mobile Menu */}
-        {menuOpen && (
-          <div className="md:hidden bg-white border-t px-4 py-3 space-y-2">
-            <Link to="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 py-2 text-gray-700">
-              <Home size={16} /> {t('nav.home')}
-            </Link>
-            <Link to="/marketplace" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 py-2 text-gray-700">
-              <ShoppingBag size={16} /> {t('nav.marketplace')}
-            </Link>
-            <Link to="/cart" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 py-2 text-gray-700">
-              <ShoppingCart size={16} /> {t('nav.cart')}
-            </Link>
-            {user ? (
-              <Link to="/profile" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 py-2 text-gray-700">
-                <User size={16} /> {t('nav.profile')}
-              </Link>
-            ) : (
-              <Link to="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 py-2 text-gray-700">
-                <User size={16} /> {t('nav.login')}
-              </Link>
-            )}
-          </div>
-        )}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="md:hidden absolute top-full left-4 right-4 mt-2"
+            >
+              <div className="glass-card rounded-3xl p-4 space-y-2 shadow-2xl">
+                {[
+                  { to: '/', label: t('nav.home'), icon: <Home size={18} /> },
+                  { to: '/marketplace', label: t('nav.marketplace'), icon: <ShoppingBag size={18} /> },
+                  { to: '/cart', label: t('nav.cart'), icon: <ShoppingCart size={18} /> },
+                  ...(user ? [{ to: '/profile', label: t('nav.profile'), icon: <User size={18} /> }] : [{ to: '/login', label: t('nav.login'), icon: <User size={18} /> }])
+                ].map((link) => (
+                  <Link 
+                    key={link.to}
+                    to={link.to} 
+                    onClick={() => setMenuOpen(false)} 
+                    className={`flex items-center gap-3 p-3 rounded-2xl transition-colors ${location.pathname === link.to ? 'bg-amber-600 text-white' : 'text-slate-600 hover:bg-amber-50'}`}
+                  >
+                    {link.icon} <span className="font-bold">{link.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Page Content */}
-      <main>{children}</main>
+      <main className="pt-4">{children}</main>
 
       {/* Footer */}
       <footer className="bg-amber-900 text-amber-100 mt-12">

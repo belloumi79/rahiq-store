@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingBag, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { ShoppingBag, CheckCircle, AlertCircle, ArrowLeft, MapPin, Phone, User, MessageSquare, ShieldCheck } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import supabase from '../lib/supabase';
@@ -40,103 +41,175 @@ export default function Checkout() {
 
   if (items.length === 0 && status !== 'success') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="text-center">
-          <ShoppingBag size={80} className="mx-auto text-amber-300 mb-4" />
-          <h2 className="text-xl font-bold text-gray-700 mb-4">{t('checkout.empty')}</h2>
-          <button onClick={() => navigate('/marketplace')} className="btn-primary">
-            ← {t('cart.continue')}
+      <div className="min-h-[80vh] flex items-center justify-center px-4">
+        <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center"
+        >
+          <div className="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mx-auto mb-6">
+            <ShoppingBag size={48} />
+          </div>
+          <h2 className="text-2xl font-black text-slate-800 mb-2">{t('cart.empty')}</h2>
+          <p className="text-slate-500 mb-8">{t('cart.emptySub')}</p>
+          <button onClick={() => navigate('/marketplace')} className="btn-premium px-8">
+            {t('nav.marketplace')}
           </button>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
   if (status === 'success') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="text-center max-w-md bg-white rounded-2xl shadow-lg p-8">
-          <CheckCircle size={80} className="mx-auto text-green-500 mb-4" />
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('checkout.success')}</h2>
-          <p className="text-gray-600 mb-6">{t('checkout.successMsg')}</p>
-          <button onClick={() => navigate('/marketplace')} className="btn-primary">
+      <div className="min-h-[80vh] flex items-center justify-center px-4">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center max-w-md glass-card rounded-[2.5rem] p-12 shadow-2xl"
+        >
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', damping: 12 }}
+            className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center text-white mx-auto mb-8 shadow-xl shadow-green-100"
+          >
+            <CheckCircle size={56} />
+          </motion.div>
+          <h2 className="text-3xl font-black text-slate-900 mb-4">{t('checkout.success')}</h2>
+          <p className="text-slate-600 font-medium mb-10 leading-relaxed">{t('checkout.successSub')}</p>
+          <button onClick={() => navigate('/marketplace')} className="btn-premium w-full py-4">
             {t('nav.marketplace')}
           </button>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6 px-4">
-      <div className="max-w-2xl mx-auto">
-        <button onClick={() => navigate('/cart')} className="flex items-center gap-1 text-gray-500 mb-4 hover:text-amber-600 text-sm">
-          <ArrowLeft size={16} /> {t('cart.back')}
-        </button>
+    <div className="min-h-screen py-12 px-4 bg-slate-50 relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-64 h-64 bg-amber-200/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl translate-x-1/3 translate-y-1/3"></div>
 
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">{t('checkout.title')}</h1>
+      <div className="max-w-4xl mx-auto relative z-10">
+        <motion.button 
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            onClick={() => navigate('/cart')} 
+            className="flex items-center gap-2 text-slate-500 mb-8 hover:text-amber-600 font-bold text-sm transition-colors group"
+        >
+          <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> {t('common.back')}
+        </motion.button>
 
-        {/* Order Summary */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-          <h2 className="font-semibold text-gray-700 mb-3 text-sm uppercase tracking-wide">{t('checkout.summary')}</h2>
-          <div className="space-y-2 mb-3">
-            {items.map((item, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <img src={item.image || 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=48&h=48&fit=crop'} alt={item.name} className="w-10 h-10 object-cover rounded-lg" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-800 truncate">{item.name}</p>
-                  <p className="text-xs text-gray-500">× {item.quantity}</p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Left Column: Form */}
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-8"
+            >
+                <div className="glass-card rounded-[2.5rem] p-8 shadow-xl">
+                    <h1 className="text-3xl font-black text-slate-900 mb-8">{t('checkout.title')}</h1>
+                    
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-4">{t('checkout.fullName')}</label>
+                                <div className="relative">
+                                    <User className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                                    <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required placeholder="Votre nom complet" className="input-premium pl-14" />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-4">{t('checkout.phone')}</label>
+                                <div className="relative">
+                                    <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                                    <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required placeholder="+216 XX XXX XXX" className="input-premium pl-14" type="tel" />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-4">{t('checkout.address')}</label>
+                                <div className="relative">
+                                    <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                                    <input value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} required placeholder="Rue, quartier, ville" className="input-premium pl-14" />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-4">{t('checkout.notes')}</label>
+                                <div className="relative">
+                                    <MessageSquare className="absolute left-5 top-5 text-slate-400" size={20} />
+                                    <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={3} placeholder="Indications pour la livraison..." className="input-premium pl-14 py-4" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {status === 'error' && (
+                            <div className="p-4 rounded-2xl bg-red-50 text-red-600 text-sm font-bold flex items-center gap-2">
+                                <AlertCircle size={20} /> {errorMsg}
+                            </div>
+                        )}
+
+                        <button type="submit" disabled={status === 'loading'} className="btn-premium w-full py-4 text-lg disabled:opacity-60 flex items-center justify-center gap-3">
+                            {status === 'loading' ? (
+                                <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+                            ) : (
+                                <>🍯 {t('checkout.submit')}</>
+                            )}
+                        </button>
+                    </form>
+
+                    <div className="mt-8 pt-8 border-t border-slate-100 flex items-center justify-center gap-2 text-slate-400 text-xs font-bold">
+                        <ShieldCheck size={16} /> PAIEMENT À LA LIVRAISON • SÉCURISÉ
+                    </div>
                 </div>
-                <p className="text-sm font-semibold text-amber-700">{item.price * item.quantity} TND</p>
-              </div>
-            ))}
-          </div>
-          <div className="border-t pt-3 flex justify-between items-center">
-            <span className="font-bold text-gray-700">{t('cart.total')}</span>
-            <span className="font-bold text-xl text-amber-700">{cartTotal} TND</span>
-          </div>
-        </div>
+            </motion.div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
-          <h2 className="font-semibold text-gray-700 mb-2 text-sm uppercase tracking-wide">{t('checkout.info')}</h2>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkout.name')} *</label>
-            <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required placeholder="Votre nom complet" className="input-field" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkout.phone')} *</label>
-            <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required placeholder="+216 XX XXX XXX" className="input-field" type="tel" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkout.address')} *</label>
-            <input value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} required placeholder="Rue, quartier" className="input-field" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkout.city')}</label>
-            <select value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className="input-field">
-              {['Tunis','Sfax','Sousse','Kairouan','Bizerte','Gabès','Ariana','Ben Arous','Mannouba','Nabeul'].map(c => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkout.notes')}</label>
-            <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={2} placeholder={t('checkout.notesPlaceholder')} className="input-field" />
-          </div>
-
-          {status === 'error' && (
-            <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg text-sm">
-              <AlertCircle size={16} /> {errorMsg}
+            {/* Right Column: Summary */}
+            <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="lg:pt-4"
+            >
+                <div className="glass-card rounded-[2.5rem] p-8 shadow-xl bg-white/40 border-white/30 backdrop-blur-sm sticky top-8">
+                    <h2 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
+                        <ShoppingBag size={24} className="text-amber-600" />
+                        {t('cart.title')}
+                    </h2>
+                    <div className="space-y-6 mb-8 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+                        {items.map((item, i) => (
+                        <div key={i} className="flex items-center gap-4">
+                            <div className="relative">
+                                <img src={item.image || 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=80&h=80&fit=crop'} alt={item.name} className="w-16 h-16 object-cover rounded-2xl shadow-sm" />
+                                <span className="absolute -top-2 -right-2 w-6 h-6 bg-amber-600 text-white text-[10px] font-black flex items-center justify-center rounded-full border-2 border-white shadow-sm">
+                                    {item.quantity}
+                                </span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-black text-slate-800 truncate">{item.name}</p>
+                                <p className="text-xs text-slate-500 font-bold">{item.price} {t('common.currency')}</p>
+                            </div>
+                            <p className="text-sm font-black text-amber-700">{(item.price * item.quantity).toFixed(2)}</p>
+                        </div>
+                        ))}
+                    </div>
+                    <div className="space-y-3 pt-6 border-t border-slate-200">
+                        <div className="flex justify-between text-slate-500 font-bold text-sm">
+                            <span>Sous-total</span>
+                            <span>{cartTotal.toFixed(2)} {t('common.currency')}</span>
+                        </div>
+                        <div className="flex justify-between text-slate-500 font-bold text-sm">
+                            <span>Livraison</span>
+                            <span className="text-green-600">Gratuite</span>
+                        </div>
+                        <div className="flex justify-between items-center pt-4 border-t border-slate-200 mt-2">
+                            <span className="text-lg font-black text-slate-800">{t('cart.total')}</span>
+                            <span className="text-2xl font-black text-amber-600">{cartTotal.toFixed(2)} <span className="text-sm font-bold">{t('common.currency')}</span></span>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+                </div>
             </div>
-          )}
-
-          <button type="submit" disabled={status === 'loading'} className="btn-primary w-full flex items-center justify-center gap-2 py-3 text-base disabled:opacity-60">
-            {status === 'loading' ? t('checkout.processing') : `🍯 ${t('checkout.confirm')}`}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
+        </div>
+    );
 }

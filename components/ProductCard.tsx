@@ -1,61 +1,94 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Product } from '../types';
-import { Plus, Star } from 'lucide-react';
+import { ShoppingCart, Star, Heart } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useCart } from '../context/CartContext';
-import { useNavigate } from 'react-router-dom';
-import RahiqLogo from './RahiqLogo';
+import { useLanguage } from '../context/LanguageContext';
+import { Link } from 'react-router-dom';
 
 interface ProductCardProps { product: Product; }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { addToCart } = useCart();
-  const navigate = useNavigate();
-  const [imgError, setImgError] = useState(false);
+    const { addToCart } = useCart();
+    const { t } = useLanguage();
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    addToCart(product);
-  };
+    return (
+        <motion.div 
+            whileHover={{ y: -12 }}
+            className="group relative flex flex-col h-full bg-white rounded-[2rem] border border-amber-50 shadow-xl shadow-amber-900/5 overflow-hidden transition-all duration-500"
+        >
+            {/* Image Section */}
+            <div className="relative aspect-[4/5] overflow-hidden">
+                <Link to={`/product/${product.id}`} className="block h-full">
+                    <img 
+                        src={product.image} 
+                        alt={product.name} 
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                    />
+                </Link>
+                
+                {/* Overlay actions */}
+                <div className="absolute top-4 right-4 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-500">
+                    <motion.button 
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-md shadow-lg flex items-center justify-center text-slate-400 hover:text-pink-500"
+                    >
+                        <Heart size={20} />
+                    </motion.button>
+                </div>
 
-  return (
-    <div
-      className="bg-white rounded-2xl shadow-sm border border-amber-100 overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-300 flex flex-col h-full"
-      onClick={() => navigate(`/product/${product.id}`)}
-    >
-      <div className="relative h-40 w-full bg-amber-50 flex items-center justify-center overflow-hidden">
-        {!imgError && product.image ? (
-             <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform hover:scale-105 duration-500" loading="lazy" onError={() => setImgError(true)} />
-        ) : (
-            <div className="opacity-50 grayscale"><RahiqLogo className="w-20 h-20" showText={false} /></div>
-        )}
+                {/* Badge */}
+                {product.is_new && (
+                    <div className="absolute top-4 left-4">
+                        <span className="px-3 py-1 rounded-full bg-amber-500 text-white text-[10px] font-bold tracking-widest uppercase shadow-lg shadow-amber-200">
+                            {t('common.new')}
+                        </span>
+                    </div>
+                )}
+            </div>
 
-        {(product.isOrganic || product.isArtisanal) && (
-          <div className="absolute top-2 left-2 flex gap-1 z-10">
-             {product.isOrganic && <span className="bg-green-600 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">BIO</span>}
-             {product.isArtisanal && <span className="bg-amber-600 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">Artisan</span>}
-          </div>
-        )}
-      </div>
+            {/* Content Section */}
+            <div className="p-6 flex flex-col flex-1">
+                <div className="flex items-center gap-1 mb-2">
+                    {[1,2,3,4,5].map(i => (
+                        <Star key={i} size={12} className="fill-amber-400 text-amber-400" />
+                    ))}
+                    <span className="text-[10px] font-bold text-slate-400 ml-1">(120+)</span>
+                </div>
+                
+                <Link to={`/product/${product.id}`} className="block">
+                    <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-amber-600 transition-colors line-clamp-2">
+                        {product.name}
+                    </h3>
+                </Link>
+                
+                <p className="text-sm text-slate-500 line-clamp-2 mb-6 flex-1">
+                    {product.description}
+                </p>
 
-      <div className="p-4 flex flex-col flex-grow">
-        <div className="flex items-center gap-1 text-amber-500 mb-1">
-            <Star size={12} fill="currentColor" />
-            <span className="text-xs text-gray-500">{product.rating} ({product.reviews})</span>
-        </div>
-        <h3 className="font-semibold text-amber-900 leading-tight mb-1 line-clamp-2">{product.name}</h3>
-        <p className="text-xs text-gray-500 mb-3">{product.producer}</p>
-
-        <div className="mt-auto flex items-center justify-between">
-          <span className="text-lg font-bold text-amber-700">{product.price.toFixed(3)} DT</span>
-          <button onClick={handleAddToCart}
-            className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center hover:bg-amber-600 hover:text-white transition-colors shadow-sm"
-          >
-            <Plus size={20} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+                <div className="flex items-center justify-between mt-auto">
+                    <div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">
+                            {t('common.price')}
+                        </span>
+                        <p className="text-2xl font-black text-amber-600 flex items-center gap-1">
+                            {product.price} <span className="text-sm font-bold">{t('common.currency')}</span>
+                        </p>
+                    </div>
+                    
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => addToCart({ ...product, quantity: 1 })}
+                        className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-200 hover:bg-amber-600 hover:shadow-amber-200 transition-all duration-300"
+                    >
+                        <ShoppingCart size={22} />
+                    </motion.button>
+                </div>
+            </div>
+        </motion.div>
+    );
 };
 
 export default ProductCard;

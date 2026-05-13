@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { fetchProducts, fetchCategories } from '../lib/supabase';
-import type { Product } from '../types';
+import { Filter, Search, ShoppingBag, SlidersHorizontal, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import ProductCard from '../components/ProductCard';
 
 const Marketplace: React.FC = () => {
   const { addToCart } = useCart();
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const [searchParams] = useSearchParams();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   useEffect(() => {
     const catFromUrl = searchParams.get('category');
@@ -30,79 +31,169 @@ const Marketplace: React.FC = () => {
           fetchProducts()
         ]);
         if (catRes) setCategories(catRes);
-        if (prodRes) {
-          console.log('[DB] products:', prodRes.length, prodRes);
-          setProducts(prodRes);
-        }
+        if (prodRes) setProducts(prodRes);
       } catch (e: any) {
         console.error('[Load error]', e.message);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
     load();
   }, []);
 
-  const filtered = products.filter(p => {
-    // Support both old text category and new UUID category_id
+  const filteredProducts = products.filter(p => {
     const matchCat = !selectedCategory || p.category === selectedCategory || p.category_id === selectedCategory;
-    const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) ||
-        p.description?.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchCat && matchSearch;
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white p-6 rounded-b-3xl">
-        <h1 className="text-3xl font-bold">{t.nav.marketplace}</h1>
-        <p className="text-amber-100 mt-1">🍯 {t.tagline}</p>
-      </div>
+    <div dir={dir} className="max-w-6xl mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Desktop Filters */}
+        <aside className="hidden md:block w-64 space-y-8">
+          <div className="glass-card rounded-3xl p-6 sticky top-32">
+            <div className="flex items-center gap-2 mb-6">
+              <SlidersHorizontal size={20} className="text-amber-600" />
+              <h2 className="font-extrabold text-amber-900">{t('market.filters')}</h2>
+            </div>
+            
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">{t('market.categories')}</h3>
+                <div className="space-y-2">
+                  <button 
+                    onClick={() => setSelectedCategory('')}
+                    className={`w-full text-left px-4 py-2 rounded-xl transition-all ${!selectedCategory ? 'bg-amber-600 text-white shadow-lg shadow-amber-200' : 'text-slate-600 hover:bg-amber-50'}`}
+                  >
+                    {t('market.all')}
+                  </button>
+                  {categories.map(cat => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      className={`w-full text-left px-4 py-2 rounded-xl transition-all ${selectedCategory === cat.id ? 'bg-amber-600 text-white shadow-lg shadow-amber-200' : 'text-slate-600 hover:bg-amber-50'}`}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
 
-      <div className="px-4 py-4 space-y-3">
-        <input
-          type="text"
-          placeholder={t.search?.placeholder || 'Rechercher un produit...'}
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="w-full p-3 border border-gray-200 rounded-xl text-sm"
-        />
-
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-          <button
-            onClick={() => setSelectedCategory('')}
-            className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border ${!selectedCategory ? 'bg-amber-500 text-white' : 'bg-white text-gray-600 border-gray-200'}`}
-          >
-            {t.nav.all || 'Tous'}
-          </button>
-          {categories.map(c => (
-            <button
-              key={c.id}
-              onClick={() => setSelectedCategory(c.id === selectedCategory ? '' : c.id)}
-              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border whitespace-nowrap ${c.id === selectedCategory || c.name === selectedCategory ? 'bg-amber-500 text-white' : 'bg-white text-gray-600 border-gray-200'}`}
+        {/* Main Content */}
+        <div className="flex-1 space-y-6">
+          {/* Search & Mobile Filter Toggle */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+              <input
+                type="text"
+                placeholder={t('market.searchPlaceholder')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="input-premium pl-12 w-full p-3 border border-gray-200 rounded-xl"
+              />
+            </div>
+            <button 
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              className="md:hidden flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-white border border-amber-100 text-amber-900 font-bold"
             >
-              {c.name}
+              <Filter size={20} /> {t('market.filterBtn')}
             </button>
-          ))}
+          </div>
+
+          {/* Mobile Filters Overlay */}
+          <AnimatePresence>
+            {showMobileFilters && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[100] md:hidden bg-black/50 backdrop-blur-sm flex justify-end"
+                onClick={() => setShowMobileFilters(false)}
+              >
+                <motion.div 
+                  initial={{ x: '100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '100%' }}
+                  className="w-80 bg-white h-full p-6 shadow-2xl"
+                  onClick={e => e.stopPropagation()}
+                >
+                  <div className="flex items-center justify-between mb-8">
+                    <h2 className="text-xl font-bold text-amber-900">{t('market.filters')}</h2>
+                    <button onClick={() => setShowMobileFilters(false)} className="p-2 rounded-full bg-slate-100"><X size={20} /></button>
+                  </div>
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">{t('market.categories')}</h3>
+                      <div className="space-y-2">
+                        <button 
+                          onClick={() => { setSelectedCategory(''); setShowMobileFilters(false); }}
+                          className={`w-full text-left px-4 py-3 rounded-2xl transition-all ${!selectedCategory ? 'bg-amber-600 text-white' : 'bg-slate-50 text-slate-600'}`}
+                        >
+                          {t('market.all')}
+                        </button>
+                        {categories.map(cat => (
+                          <button
+                            key={cat.id}
+                            onClick={() => { setSelectedCategory(cat.id); setShowMobileFilters(false); }}
+                            className={`w-full text-left px-4 py-3 rounded-2xl transition-all ${selectedCategory === cat.id ? 'bg-amber-600 text-white' : 'bg-slate-50 text-slate-600'}`}
+                          >
+                            {cat.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Results Grid */}
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 py-12">
+              {[1,2,3,4,5,6].map(i => (
+                <div key={i} className="h-96 rounded-3xl bg-slate-200 animate-pulse"></div>
+              ))}
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-24 bg-white rounded-3xl border border-dashed border-amber-200"
+            >
+              <ShoppingBag size={64} className="mx-auto text-amber-200 mb-4" />
+              <h3 className="text-xl font-bold text-amber-900 mb-2">{t('market.noResults')}</h3>
+              <p className="text-slate-500">{t('market.tryDifferent')}</p>
+              <button onClick={() => { setSearchQuery(''); setSelectedCategory(''); }} className="mt-6 text-amber-600 font-bold hover:underline">
+                {t('market.resetFilters')}
+              </button>
+            </motion.div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <AnimatePresence mode='popLayout'>
+                {filteredProducts.map((p) => (
+                  <motion.div
+                    key={p.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ProductCard product={p} onAddToCart={addToCart} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
         </div>
       </div>
-
-      {loading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full mx-auto" />
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-12 text-gray-400">
-          <ShoppingBag size={48} className="mx-auto mb-3 opacity-40" />
-          <p className="text-lg">{t.marketplace?.noProducts || 'Aucun produit trouvé'}</p>
-          <Link to="/" className="text-amber-600 text-sm mt-2 inline-block">← {t.nav.home}</Link>
-        </div>
-      ) : (
-        <div className="px-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filtered.map(p => (
-            <ProductCard key={p.id} product={p} onAddToCart={addToCart} />
-          ))}
-        </div>
-      )}
     </div>
   );
 };
