@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
-import { supabase } from '../lib/supabase';
+import supabase from '../lib/supabase';
 import { Loader, CheckCircle } from 'lucide-react';
 
 const Checkout: React.FC = () => {

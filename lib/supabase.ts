@@ -1,50 +1,63 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://fcvyhztkhvswwbbzqdrr.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjdnloentrLWh2c3d3YmJ6cWYiLCJyYW5kb20iOiJxdWFydHoiLCJpYXQiOjE2MzYwNzQ2MDAsImV4cCI6MTk1MTYzMDYwMH0.RAfWSo0O2IZXxJ9FS0G8z1H2pYcNvI3i2p1T3PkAX4o';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://fcvyhztkhvswwbbzqdrr.supabase.co';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjdnloenh0a2h2c3d3YmJxZHFyciIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNjM3Mjc0MTY2LCJleHAiOjE5NTI4NTAxNjZ9.dcl4-WRwq4LZuMmLihVoC1q0aG0vF5h0Y5J8hF6YQZ0';
 
-if (!supabaseKey) {
-  console.warn('[Supabase] ⚠️ Clé API non configurée — les requêtes utiliseront le cache local uniquement');
-}
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-export const supabase = createClient(supabaseUrl, supabaseKey || 'placeholder', {
-  auth: { persistSession: false, autoRefreshToken: false }
-});
+export default supabase;
 
-class MemoryStorage {
-  private store: Record<string, string> = {};
-  getItem(key: string) { return this.store[key] || null; }
-  setItem(key: string, value: string) { this.store[key] = value; }
-  removeItem(key: string) { delete this.store[key]; }
-  clear() { this.store = {}; }
-  get length() { return Object.keys(this.store).length; }
-  key(index: number) { return Object.keys(this.store)[index] || null; }
-}
-
-if (typeof window !== 'undefined' && !window.localStorage) {
-  Object.defineProperty(window, 'localStorage', { value: new MemoryStorage(), writable: false });
-}
-
+// Supabase stores product category as text (e.g. "Miel", "Dérivés") but we migrated to UUID category_id
 export interface Product {
-  id: string; name: string; description: string; price: number;
-  image: string; category: string; subcategory?: string; stock: number;
-  isOrganic: boolean; isArtisanal: boolean; rating: number; reviews: number[];
-  producer?: string; weight?: string; origin?: string;
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  category_id?: string; // UUID from categories table
+  origin?: string;
+  weight?: string;
+  isOrganic?: boolean;
+  isArtisanal?: boolean;
+  rating?: number;
+  reviews?: Review[];
+}
+
+export interface Review {
+  user: string;
+  rating: number;
+  comment: string;
+  date: string;
 }
 
 export function mapProductFromSupabase(doc: any): Product {
   return ({
-    id: doc.id || String(Date.now()),
-    name: doc.name || '—',
-    description: doc.description || '',
+    id: doc.id,
+    name: doc.name ?? '',
+    description: doc.description ?? '',
     price: doc.price ?? 0,
-    image: doc.image || doc.publicUrl || '',
-    category: doc.category_id || doc.category || '',
-    subcategory: doc.subcategory || '',
-    stock: doc.stock ?? 99,
+    image: doc.image ?? doc.publicUrl ?? doc.images?.[0] ?? '',
+    // Support both old text category and new UUID category_id
+    category: doc.category ?? doc.category_id ?? doc.subcategory ?? '',
+    category_id: doc.category_id ?? '',
+    origin: doc.origin ?? '',
+    weight: doc.weight ?? '',
     isOrganic: doc.is_organic ?? false,
     isArtisanal: doc.is_artisanal ?? false,
     rating: doc.rating ?? 0,
     reviews: doc.reviews ?? []
   });
+}
+
+export async function fetchProducts() {
+  const { data, error } = await supabase.from('products').select('*');
+  if (error) throw error;
+  return data?.map(mapProductFromSupabase) ?? [];
+}
+
+export async function fetchCategories() {
+  const { data, error } = await supabase.from('categories').select('*');
+  if (error) throw error;
+  return data ?? [];
 }

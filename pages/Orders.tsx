@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
+import supabase from '../lib/supabase';
 import { Package, ShoppingBag, Phone, MapPin } from 'lucide-react';
 import { t } from '../i18n';
 

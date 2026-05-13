@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
-import { supabase, mapProductFromSupabase } from '../lib/supabase';
+import supabase, { mapProductFromSupabase } from '../lib/supabase';
 import { Product } from '../types';
 import { ArrowLeft, ShoppingBag, Leaf, Award, CheckCircle, Loader } from 'lucide-react';
 
 const ProductDetails: React.FC = () => {
     const { id } = useParams();
     const { dir, t } = useLanguage();
-    const { addItem } = useCart();
+    const { addToCart } = useCart();
     const navigate = useNavigate();
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
@@ -103,7 +103,7 @@ const ProductDetails: React.FC = () => {
                                             className="w-8 h-8 flex items-center justify-center text-amber-700 font-bold text-lg hover:bg-amber-100 rounded-lg">+</button>
                                     </div>
                                 </div>
-                                <button onClick={() => { addItem({ ...product, quantity }); navigate('/cart'); }}
+                                <button onClick={() => { addToCart({ ...product, quantity }); navigate('/cart'); }}
                                     className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-colors">
                                     <ShoppingBag size={18} />{t.product.addToCart}
                                 </button>

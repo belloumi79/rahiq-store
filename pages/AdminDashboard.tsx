@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
-import { supabase, mapProductFromSupabase } from '../lib/supabase';
+import supabase, { mapProductFromSupabase } from '../lib/supabase';
 import imageCompression from 'browser-image-compression';
 import { t } from '../i18n';
 import { Loader, Plus, Upload, Trash2, Edit2, Package, ShoppingBag, CheckCircle, FolderOpen, Mail, Phone, MapPin } from 'lucide-react';
