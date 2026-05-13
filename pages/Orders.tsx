@@ -3,12 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import supabase from '../lib/supabase';
-import { Package, ShoppingBag, Phone, MapPin } from 'lucide-react';
-import { t } from '../i18n';
+import { Package, Phone, MapPin } from 'lucide-react';
 
 const Orders: React.FC = () => {
     const { user } = useAuth();
-    const { dir } = useLanguage();
+    const { dir, t } = useLanguage();
     const navigate = useNavigate();
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -21,7 +20,7 @@ const Orders: React.FC = () => {
             setLoading(false);
         };
         fetchOrders();
-    }, [user]);
+    }, [user, navigate]);
 
     const statusColor = (s: string) => ({
         pending: 'bg-amber-100 text-amber-700',
@@ -29,6 +28,8 @@ const Orders: React.FC = () => {
         delivered: 'bg-green-100 text-green-700',
         cancelled: 'bg-red-100 text-red-700',
     }[s] || 'bg-gray-100 text-gray-700');
+
+    if (loading) return null;
 
     return (
         <div className="px-4 py-4" dir={dir}>
@@ -53,7 +54,7 @@ const Orders: React.FC = () => {
                                     <p className="text-xs text-gray-400">{new Date(order.created_at).toLocaleDateString()}</p>
                                 </div>
                                 <span className={`text-xs font-bold px-3 py-1 rounded-full ${statusColor(order.status)}`}>
-                                    {t(`orders.status.${order.status}` as any) || order.status}
+                                    {t(`orders.status.${order.status}`) || order.status}
                                 </span>
                             </div>
                             <p className="text-sm text-gray-600 mb-2">{order.items}</p>

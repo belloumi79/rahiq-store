@@ -8,6 +8,7 @@ export default {
     orders: 'طلباتي',
     login: 'تسجيل الدخول',
     logout: 'تسجيل الخروج',
+    promo: 'شحن مجاني للطلبات التي تزيد عن 100 دينار',
   },
   home: {
     heroTitle: 'عسل تونس أصلي وطبيعي',
@@ -97,6 +98,8 @@ export default {
     noAccount: 'ليس لديك حساب؟ سجل الآن',
     hasAccount: 'لديك حساب؟ سجل الدخول',
     signUp: 'سجل الآن',
+    or: 'أو',
+    guest: 'المواصلة كضيف',
   },
   admin: {
     title: 'لوحة التحكم',
@@ -127,7 +130,6 @@ export default {
     noProducts: 'لا توجد منتجات',
     noCategories: 'لا توجد أقسام',
     noOrders: 'لا توجد طلبات',
-    orderFor: 'طلب من',
     phone: 'الهاتف',
     delivery: 'العنوان',
     updateStatus: 'تحديث',
@@ -140,6 +142,13 @@ export default {
     tabProducts: 'إدارة المنتجات',
     tabCategories: 'إدارة الأقسام',
     tabOrders: 'متابعة الطلبات',
+    orderFor: 'طلب لـ',
+  },
+  footer: {
+    about: 'عسل تونسي 100٪ ، طبيعي وأصيل.',
+    links: 'الروابط',
+    follow: 'تابعنا',
+    rights: 'كل الحقوق محفوظة.',
   },
   common: {
     loading: 'جاري التحميل...',
@@ -148,6 +157,7 @@ export default {
     close: 'إغلاق',
     confirm: 'تأكيد',
     cancel: 'إلغاء',
-    TND: 'د.ت',
+    currency: 'د.ت',
+    back: 'رجوع',
   },
 };

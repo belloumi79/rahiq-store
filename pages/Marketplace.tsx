@@ -54,14 +54,14 @@ const Marketplace: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white p-6 rounded-b-3xl">
-        <h1 className="text-3xl font-bold">{t.nav.marketplace}</h1>
-        <p className="text-amber-100 mt-1">🍯 {t.tagline}</p>
+        <h1 className="text-3xl font-bold">{t('nav.marketplace')}</h1>
+        <p className="text-amber-100 mt-1">🍯 {t('home.heroSub')}</p>
       </div>
 
       <div className="px-4 py-4 space-y-3">
         <input
           type="text"
-          placeholder={t.search?.placeholder || 'Rechercher un produit...'}
+          placeholder={t('marketplace.search')}
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="w-full p-3 border border-gray-200 rounded-xl text-sm"
@@ -72,7 +72,7 @@ const Marketplace: React.FC = () => {
             onClick={() => setSelectedCategory('')}
             className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border ${!selectedCategory ? 'bg-amber-500 text-white' : 'bg-white text-gray-600 border-gray-200'}`}
           >
-            {t.nav.all || 'Tous'}
+            {t('nav.all')}
           </button>
           {categories.map(c => (
             <button
@@ -93,8 +93,8 @@ const Marketplace: React.FC = () => {
       ) : filtered.length === 0 ? (
         <div className="text-center py-12 text-gray-400">
           <ShoppingBag size={48} className="mx-auto mb-3 opacity-40" />
-          <p className="text-lg">{t.marketplace?.noProducts || 'Aucun produit trouvé'}</p>
-          <Link to="/" className="text-amber-600 text-sm mt-2 inline-block">← {t.nav.home}</Link>
+          <p className="text-lg">{t('marketplace.noProducts')}</p>
+          <Link to="/" className="text-amber-600 text-sm mt-2 inline-block">← {t('nav.home')}</Link>
         </div>
       ) : (
         <div className="px-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

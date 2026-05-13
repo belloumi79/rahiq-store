@@ -19,7 +19,7 @@ const Login: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        if (!email || !password) { setError('Veuillez remplir tous les champs.'); return; }
+        if (!email || !password) { setError(t('common.error')); return; }
 
         setLoading(true);
         try {
@@ -33,7 +33,7 @@ const Login: React.FC = () => {
                 navigate('/');
             }
         } catch (err: any) {
-            setError(err.message || 'Erreur de connexion.');
+            setError(err.message || t('common.error'));
         } finally { setLoading(false); }
     };
 
@@ -43,8 +43,8 @@ const Login: React.FC = () => {
             <div className="w-full max-w-sm">
                 <div className="flex flex-col items-center mb-8">
                     <RahiqLogo className="w-24 h-24 mb-4" showText={true} />
-                    <h1 className="text-2xl font-bold text-amber-900">{t.login.welcome}</h1>
-                    <p className="text-sm text-gray-500 mt-1">{t.login.loginSub}</p>
+                    <h1 className="text-2xl font-bold text-amber-900">{t('login.welcome')}</h1>
+                    <p className="text-sm text-gray-500 mt-1">{t('login.loginSub')}</p>
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-xl p-6 border border-amber-100">
@@ -52,13 +52,13 @@ const Login: React.FC = () => {
                         {error && <div className="bg-amber-50 text-amber-700 text-sm p-3 rounded-lg border border-amber-200">{error}</div>}
 
                         <div>
-                            <label className="block text-xs font-semibold text-gray-600 mb-1">{t.login.email}</label>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">{t('login.email')}</label>
                             <input type="email" value={email} onChange={e => setEmail(e.target.value)}
                                 className="w-full border border-amber-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500" placeholder="votre@email.com" />
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-gray-600 mb-1">{t.login.password}</label>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">{t('login.password')}</label>
                             <div className="relative">
                                 <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
                                     className="w-full border border-amber-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500 pr-10" placeholder="••••••••" />
@@ -70,14 +70,14 @@ const Login: React.FC = () => {
 
                         <button type="submit" disabled={loading}
                             className="w-full bg-amber-600 text-white py-3 rounded-xl font-bold text-sm hover:bg-amber-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
-                            {loading ? <><Loader className="animate-spin" size={18} />{t.common.loading}</> : t.login.submit}
+                            {loading ? <><Loader className="animate-spin" size={18} />{t('common.loading')}</> : t('login.submit')}
                         </button>
                     </form>
 
                     <div className="mt-4 text-center">
                         <button onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(''); }}
                             className="text-sm text-amber-600 hover:underline font-medium">
-                            {mode === 'signin' ? t.login.noAccount : t.login.hasAccount}
+                            {mode === 'signin' ? t('login.noAccount') : t('login.hasAccount')}
                         </button>
                     </div>
                 </div>

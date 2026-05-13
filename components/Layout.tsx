@@ -15,7 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-gray-50">
       {/* Top Bar */}
       <div className="bg-amber-600 text-white text-center py-1.5 text-sm">
-        🍯 {t('nav.promo') || 'Livraison gratuite dès 100 TND de commande'}
+        🍯 {t('nav.promo')}
       </div>
 
       {/* Navbar */}
@@ -96,7 +96,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
             <div>
               <div className="font-bold text-amber-50 text-lg mb-2">🍯 Rahiq Store</div>
-              <p>{t('footer.about') || 'Votre miel 100% Tunisien, naturel et authentique.'}</p>
+              <p>{t('footer.about')}</p>
             </div>
             <div>
               <div className="font-semibold text-amber-50 mb-2">{t('footer.links') || 'Liens'}</div>
@@ -119,7 +119,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="text-center mt-6 pt-4 border-t border-amber-800 text-xs">
-            © 2025 Rahiq Store. {t('footer.rights') || 'Tous droits réservés.'}
+            © 2025 Rahiq Store. {t('footer.rights')}
           </div>
         </div>
       </footer>
