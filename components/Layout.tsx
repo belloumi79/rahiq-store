@@ -4,6 +4,7 @@ import { Home, ShoppingBag, ShoppingCart, User, Instagram, Menu, X } from 'lucid
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { RahiqLogo } from './RahiqLogo';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -30,12 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="glass-card rounded-3xl px-6 py-3 flex items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group">
-              <motion.span 
-                whileHover={{ rotate: 20, scale: 1.2 }}
-                className="text-2xl"
-              >
-                🍯
-              </motion.span>
+              <RahiqLogo className="w-10 h-10" showText={false} size={40} />
               <span className="font-extrabold text-xl bg-gradient-to-r from-amber-800 to-amber-600 bg-clip-text text-transparent">
                 Rahiq Store
               </span>
@@ -148,7 +144,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {/* Brand Section */}
               <div className="space-y-6 lg:col-span-1">
                 <Link to="/" className="flex items-center gap-2">
-                  <span className="text-3xl">🍯</span>
+                  <RahiqLogo className="w-12 h-12" showText={false} size={48} />
                   <span className="font-black text-2xl bg-gradient-to-r from-amber-800 to-amber-600 bg-clip-text text-transparent">
                     Rahiq Store
                   </span>
