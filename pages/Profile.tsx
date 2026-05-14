@@ -4,11 +4,10 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import supabase from '../lib/supabase';
 import { Loader, Check } from 'lucide-react';
-import { t } from '../i18n';
 
 const Profile: React.FC = () => {
     const { user, logout } = useAuth();
-    const { dir } = useLanguage();
+    const { dir, t } = useLanguage();
     const navigate = useNavigate();
     const [saved, setSaved] = useState(false);
     const [form, setForm] = useState({ name: user?.name || '', address: '', phone: '' });

@@ -43,7 +43,7 @@ export default function Checkout() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
           <ShoppingBag size={80} className="mx-auto text-amber-300 mb-4" />
-          <h2 className="text-xl font-bold text-gray-700 mb-4">{t('checkout.empty')}</h2>
+          <h2 className="text-xl font-bold text-gray-700 mb-4">{t('cart.empty')}</h2>
           <button onClick={() => navigate('/marketplace')} className="btn-primary">
             ← {t('cart.continue')}
           </button>
@@ -58,7 +58,7 @@ export default function Checkout() {
         <div className="text-center max-w-md bg-white rounded-2xl shadow-lg p-8">
           <CheckCircle size={80} className="mx-auto text-green-500 mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('checkout.success')}</h2>
-          <p className="text-gray-600 mb-6">{t('checkout.successMsg')}</p>
+          <p className="text-gray-600 mb-6">{t('checkout.successSub')}</p>
           <button onClick={() => navigate('/marketplace')} className="btn-primary">
             {t('nav.marketplace')}
           </button>
@@ -102,7 +102,7 @@ export default function Checkout() {
           <h2 className="font-semibold text-gray-700 mb-2 text-sm uppercase tracking-wide">{t('checkout.info')}</h2>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkout.name')} *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkout.fullName')} *</label>
             <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required placeholder="Votre nom complet" className="input-field" />
           </div>
           <div>
@@ -123,7 +123,7 @@ export default function Checkout() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkout.notes')}</label>
-            <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={2} placeholder={t('checkout.notesPlaceholder')} className="input-field" />
+            <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={2} placeholder={t('checkout.notes')} className="input-field" />
           </div>
 
           {status === 'error' && (
@@ -133,7 +133,7 @@ export default function Checkout() {
           )}
 
           <button type="submit" disabled={status === 'loading'} className="btn-primary w-full flex items-center justify-center gap-2 py-3 text-base disabled:opacity-60">
-            {status === 'loading' ? t('checkout.processing') : `🍯 ${t('checkout.confirm')}`}
+            {status === 'loading' ? t('checkout.processing') : `🍯 ${t('checkout.submit')}`}
           </button>
         </form>
       </div>

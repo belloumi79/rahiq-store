@@ -15,7 +15,7 @@ export default function Cart() {
         <div className="text-center">
           <ShoppingCart size={80} className="mx-auto text-amber-300 mb-4" />
           <h2 className="text-2xl font-bold text-gray-700 mb-2">{t('cart.empty')}</h2>
-          <p className="text-gray-500 mb-6">{t('cart.emptyDesc')}</p>
+          <p className="text-gray-500 mb-6">{t('cart.emptySub')}</p>
           <Link to="/marketplace" className="btn-primary inline-flex items-center gap-2">
             <ArrowLeft size={16} /> {t('cart.continue')}
           </Link>
@@ -62,7 +62,7 @@ export default function Cart() {
             <span className="text-amber-700 text-xl">{cartTotal} TND</span>
           </div>
           <div className="flex gap-3">
-            <button onClick={clearCart} className="btn-outline flex-1 text-sm">{t('cart.clear')}</button>
+            <button onClick={clearCart} className="btn-outline flex-1 text-sm">{t('common.cancel')}</button>
             <button onClick={() => navigate('/checkout')} className="btn-primary flex-1 flex items-center justify-center gap-2">
               {t('cart.checkout')} →
             </button>
