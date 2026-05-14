@@ -7,7 +7,7 @@ export const RahiqLogo: React.FC<{
 }> = ({ className = "w-32 h-32", showText = true, size = 128 }) => (
   <div className={`flex flex-col items-center ${className}`}>
     <img
-      src="/assets/favicon.png"
+      src="/logo.png"
       alt="Rahiq Store"
       width={size}
       height={size}
