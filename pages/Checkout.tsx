@@ -25,7 +25,6 @@ export default function Checkout() {
         customer_name: form.name,
         customer_phone: form.phone,
         delivery_address: form.address,
-        city: form.city,
         total: cartTotal,
         status: 'pending',
         items: items.map(i => ({ id: i.id, name: i.name, quantity: i.quantity, price: i.price }))
@@ -117,28 +116,28 @@ export default function Checkout() {
                                 <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-4">{t('checkout.fullName')}</label>
                                 <div className="relative">
                                     <User className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                                    <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required placeholder="Votre nom complet" className="input-premium pl-14" />
+                                    <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required placeholder={t('checkout.namePlaceholder')} className="input-premium pl-14" />
                                 </div>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-4">{t('checkout.phone')}</label>
                                 <div className="relative">
                                     <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                                    <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required placeholder="+216 XX XXX XXX" className="input-premium pl-14" type="tel" />
+                                    <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required placeholder={t('checkout.phonePlaceholder')} className="input-premium pl-14" type="tel" />
                                 </div>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-4">{t('checkout.address')}</label>
                                 <div className="relative">
                                     <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                                    <input value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} required placeholder="Rue, quartier, ville" className="input-premium pl-14" />
+                                    <input value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} required placeholder={t('checkout.addressPlaceholder')} className="input-premium pl-14" />
                                 </div>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-4">{t('checkout.notes')}</label>
                                 <div className="relative">
                                     <MessageSquare className="absolute left-5 top-5 text-slate-400" size={20} />
-                                    <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={3} placeholder="Indications pour la livraison..." className="input-premium pl-14 py-4" />
+                                    <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={3} placeholder={t('checkout.notesPlaceholder')} className="input-premium pl-14 py-4" />
                                 </div>
                             </div>
                         </div>
@@ -159,7 +158,7 @@ export default function Checkout() {
                     </form>
 
                     <div className="mt-8 pt-8 border-t border-slate-100 flex items-center justify-center gap-2 text-slate-400 text-xs font-bold">
-                        <ShieldCheck size={16} /> PAIEMENT À LA LIVRAISON • SÉCURISÉ
+                        <ShieldCheck size={16} /> {t('checkout.secure')}
                     </div>
                 </div>
             </motion.div>
@@ -194,12 +193,12 @@ export default function Checkout() {
                     </div>
                     <div className="space-y-3 pt-6 border-t border-slate-200">
                         <div className="flex justify-between text-slate-500 font-bold text-sm">
-                            <span>Sous-total</span>
+                            <span>{t('cart.subtotal')}</span>
                             <span>{cartTotal.toFixed(2)} {t('common.currency')}</span>
                         </div>
                         <div className="flex justify-between text-slate-500 font-bold text-sm">
-                            <span>Livraison</span>
-                            <span className="text-green-600">Gratuite</span>
+                            <span>{t('cart.shipping')}</span>
+                            <span className="text-green-600">{t('cart.free')}</span>
                         </div>
                         <div className="flex justify-between items-center pt-4 border-t border-slate-200 mt-2">
                             <span className="text-lg font-black text-slate-800">{t('cart.total')}</span>
