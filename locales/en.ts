@@ -80,6 +80,7 @@ export default {
     currency: 'TND',
     price: 'Price',
     new: 'New',
+    error: 'An error occurred',
   },
   cart: {
     title: 'Your Cart',

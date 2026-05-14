@@ -34,7 +34,7 @@ export default function Checkout() {
       clearCart();
     } catch (err: any) {
       setStatus('error');
-      setErrorMsg(err.message || 'Une erreur est survenue');
+      setErrorMsg(err.message || t('common.error'));
     }
   };
 

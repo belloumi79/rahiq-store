@@ -80,6 +80,7 @@ export default {
     currency: 'د.ت',
     price: 'السعر',
     new: 'جديد',
+    error: 'حدث خطأ ما',
   },
   cart: {
     title: 'سلتك',
