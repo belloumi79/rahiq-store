@@ -21,12 +21,14 @@ export default function Checkout() {
     setErrorMsg('');
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
       const { error: orderError } = await supabase.from('orders').insert({
-        customer_name: form.name,
-        customer_phone: form.phone,
+        full_name: form.name,
+        phone: form.phone,
         delivery_address: form.address,
         total: cartTotal,
         status: 'pending',
+        user_id: user.user?.id || null,
         items: items.map(i => ({ id: i.id, name: i.name, quantity: i.quantity, price: i.price }))
       });
       if (orderError) throw orderError;

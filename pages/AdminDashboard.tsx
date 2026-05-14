@@ -444,13 +444,12 @@ const AdminDashboard: React.FC = () => {
                             <div key={order.id} className="bg-white rounded-2xl p-4 shadow-sm border border-amber-100">
                                 <div className="flex justify-between items-start mb-3">
                                     <div>
-                                        <p className="font-bold text-amber-900 text-sm">{t('admin.orderFor')}: {order.customer_name}</p>
+                                        <p className="font-bold text-amber-900 text-sm">{t('admin.orderFor')}: {order.full_name || order.customer_name}</p>
                                         <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
-                                            <span className="flex items-center gap-1"><Mail size={12} />{order.customer_email}</span>
-                                            <span className="flex items-center gap-1"><Phone size={12} />{order.customer_phone}</span>
+                                            <span className="flex items-center gap-1"><Phone size={12} />{order.phone || order.customer_phone}</span>
                                         </div>
                                         <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
-                                            <MapPin size={12} />{order.delivery_address}, {order.city}
+                                            <MapPin size={12} />{order.delivery_address}
                                         </div>
                                         {order.notes && <p className="text-xs text-gray-400 mt-1 italic">"{order.notes}"</p>}
                                     </div>
