@@ -63,7 +63,6 @@ const ProductDetails: React.FC = () => {
             >
                 <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> {t('common.back')}
             </button>
-+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
                 <motion.div 
                     initial={{ opacity: 0, x: -50 }}

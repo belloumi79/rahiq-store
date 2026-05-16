@@ -113,10 +113,10 @@ const AdminDashboard: React.FC = () => {
         try {
             if (!event.target.files || event.target.files.length === 0) return;
             setUploading(true);
-            const files = Array.from(event.target.files);
+            const files = Array.from(event.target.files) as File[];
             const options = { maxWidth: 1200, useWebWorker: true, toWebp: true, quality: 0.7 };
             
-            const uploadPromises = files.map(async (file) => {
+            const uploadPromises = files.map(async (file: File) => {
                 const compressedFile = await imageCompression(file, options);
                 const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.webp`;
                 const { error: uploadError } = await supabase.storage.from('rahiq-store').upload(fileName, compressedFile, { contentType: 'image/webp' });
