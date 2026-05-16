@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
+import supabase from '../lib/supabase';
 
 export interface AuthUser {
     id: string;
@@ -18,17 +19,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const ADMIN_EMAIL = 'houdaboughalleb591@gmail.com';
 
-const getSupabaseClient = (): SupabaseClient | null => {
-    try {
-        const url = (import.meta as any).env?.VITE_SUPABASE_URL;
-        const key = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
-        if (!url || !key) return null;
-        return createClient(url, key);
-    } catch {
-        return null;
-    }
-};
-
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
@@ -37,7 +27,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     useEffect(() => {
         const checkUser = async () => {
             try {
-                const supabase = getSupabaseClient();
                 if (!supabase) { setLoading(false); return; }
                 const { data: { session } } = await supabase.auth.getSession();
                 if (session?.user) {
@@ -61,7 +50,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         checkUser();
 
-        const supabase = getSupabaseClient();
         if (!supabase) return;
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             if (session?.user) {
@@ -82,7 +70,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const logout = async () => {
         try {
-            const supabase = getSupabaseClient();
             if (supabase) await supabase.auth.signOut();
         } catch (error) {
             console.error("Logout error", error);
