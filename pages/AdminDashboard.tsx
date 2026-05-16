@@ -345,52 +345,36 @@ const AdminDashboard: React.FC = () => {
                                     </button>
                                 ))}
                             </div>
-                            <form onSubmit={handleSubmitProduct} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">
-                                        {t('admin.name')} ({formLang.toUpperCase()})
-                                    </label>
-                                    <input 
-                                        value={formLang === 'ar' ? formData.name_ar : formLang === 'fr' ? formData.name_fr : formData.name_en} 
-                                        onChange={e => setFormData(p => ({ ...p, [`name_${formLang}`]: e.target.value }))} 
-                                        required={formLang === 'ar'}
-                                        dir={formLang === 'ar' ? 'rtl' : 'ltr'}
-                                        className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.category')}</label>
-                                    <select value={formData.category_id}
-                                        onChange={e => setFormData(p => ({ ...p, category_id: e.target.value }))}
-                                        required
-                                        className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400 bg-white">
-                                        <option value="">— {t('admin.category')} —</option>
-                                        {categories.map(c => (
-                                            <option key={c.id} value={c.id}>{c.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.price')} (TND)</label>
-                                    <input type="number" step="0.01" value={formData.price}
-                                        onChange={e => setFormData(p => ({ ...p, price: e.target.value }))} required
-                                        className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.producer')}</label>
-                                    <input value={formData.producer}
-                                        onChange={e => setFormData(p => ({ ...p, producer: e.target.value }))} required
-                                        className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
-                                </div>
-                                <div className="md:col-span-2">
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">
-                                        {t('admin.description')} ({formLang.toUpperCase()})
-                                    </label>
-                                    <textarea 
-                                        value={formLang === 'ar' ? formData.description_ar : formLang === 'fr' ? formData.description_fr : formData.description_en}
-                                        onChange={e => setFormData(p => ({ ...p, [`description_${formLang}`]: e.target.value }))} 
-                                        rows={3}
-                                        dir={formLang === 'ar' ? 'rtl' : 'ltr'}
-                                        className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
+                                <div className="md:col-span-2 space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.name')} (AR) *</label>
+                                            <input value={formData.name_ar} onChange={e => setFormData(p => ({ ...p, name_ar: e.target.value }))} required dir="rtl" className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.name')} (FR)</label>
+                                            <input value={formData.name_fr} onChange={e => setFormData(p => ({ ...p, name_fr: e.target.value }))} className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.name')} (EN)</label>
+                                            <input value={formData.name_en} onChange={e => setFormData(p => ({ ...p, name_en: e.target.value }))} className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.description')} (AR)</label>
+                                            <textarea value={formData.description_ar} onChange={e => setFormData(p => ({ ...p, description_ar: e.target.value }))} rows={2} dir="rtl" className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.description')} (FR)</label>
+                                            <textarea value={formData.description_fr} onChange={e => setFormData(p => ({ ...p, description_fr: e.target.value }))} rows={2} className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.description')} (EN)</label>
+                                            <textarea value={formData.description_en} onChange={e => setFormData(p => ({ ...p, description_en: e.target.value }))} rows={2} className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.image')} (Galerie)</label>
@@ -511,48 +495,43 @@ const AdminDashboard: React.FC = () => {
                                    </button>
                                 ))}
                             </div>
-                            <form onSubmit={handleSubmitCategory} className="flex flex-col md:flex-row gap-3 items-end">
-                                <div className="flex-1">
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">
-                                        {t('admin.categoryName')} ({formLang.toUpperCase()})
-                                    </label>
-                                    <input 
-                                        value={formLang === 'ar' ? catNameAr : formLang === 'fr' ? catNameFr : catNameEn}
-                                        onChange={e => {
-                                            const val = e.target.value;
-                                            if (formLang === 'ar') setCatNameAr(val);
-                                            else if (formLang === 'fr') setCatNameFr(val);
-                                            else setCatNameEn(val);
-                                            if (!catSlug) setCatSlug(slugify(val));
-                                        }}
-                                        required={formLang === 'ar'}
-                                        dir={formLang === 'ar' ? 'rtl' : 'ltr'}
-                                        placeholder="Ex: Miel de Thym"
-                                        className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
+                            <form onSubmit={handleSubmitCategory} className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.categoryName')} (AR) *</label>
+                                        <input value={catNameAr} onChange={e => { setCatNameAr(e.target.value); if(!catSlug) setCatSlug(slugify(e.target.value)); }} required dir="rtl" className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.categoryName')} (FR)</label>
+                                        <input value={catNameFr} onChange={e => setCatNameFr(e.target.value)} className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.categoryName')} (EN)</label>
+                                        <input value={catNameEn} onChange={e => setCatNameEn(e.target.value)} className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
+                                    </div>
                                 </div>
-                                <div className="w-full md:w-48">
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">Slug</label>
-                                    <input value={catSlug}
-                                        onChange={e => setCatSlug(e.target.value)}
-                                        placeholder="slug-auto"
-                                        className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400 bg-amber-50" />
+                                <div className="flex flex-col md:flex-row gap-4 items-end">
+                                    <div className="flex-1">
+                                        <label className="block text-xs font-semibold text-gray-600 mb-1">Slug</label>
+                                        <input value={catSlug} onChange={e => setCatSlug(e.target.value)} placeholder="slug-auto" className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400 bg-amber-50" />
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <label className="cursor-pointer flex items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-700 px-4 py-2.5 rounded-xl text-sm font-medium">
+                                            <Upload size={16} />{t('admin.selectImage')}
+                                            <input type="file" accept="image/*" className="hidden" onChange={e => handleImageUpload(e, 'category')} />
+                                        </label>
+                                        {catImage && <img src={catImage} alt="" className="h-10 w-10 object-cover rounded-xl" />}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button type="submit" disabled={isLoading} className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2">
+                                            {isLoading ? <Loader className="animate-spin" size={16} /> : <CheckCircle size={16} />}{t('admin.save')}
+                                        </button>
+                                        {isEditingCategory && (
+                                            <button type="button" onClick={() => { setIsEditingCategory(false); setCatNameAr(''); setCatNameFr(''); setCatNameEn(''); setCatSlug(''); setCatImage(''); }}
+                                                className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-6 py-2.5 rounded-xl text-sm font-medium">{t('admin.cancel')}</button>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <label className="cursor-pointer flex items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-700 px-4 py-2.5 rounded-xl text-sm font-medium">
-                                        <Upload size={16} />{t('admin.selectImage')}
-                                        <input type="file" accept="image/*" className="hidden"
-                                            onChange={e => handleImageUpload(e, 'category')} />
-                                    </label>
-                                    {catImage && <img src={catImage} alt="" className="h-10 w-10 object-cover rounded-xl" />}
-                                </div>
-                                <button type="submit" disabled={isLoading}
-                                    className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2">
-                                    {isLoading ? <Loader className="animate-spin" size={16} /> : <CheckCircle size={16} />}{t('admin.save')}
-                                </button>
-                                {isEditingCategory && (
-                                    <button type="button" onClick={() => { setIsEditingCategory(false); setCatNameAr(''); setCatNameFr(''); setCatNameEn(''); setCatSlug(''); setCatImage(''); }}
-                                        className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-6 py-2.5 rounded-xl text-sm font-medium">{t('admin.cancel')}</button>
-                                )}
                             </form>
                         </div>
 

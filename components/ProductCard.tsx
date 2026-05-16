@@ -19,12 +19,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         >
             {/* Image Section */}
             <div className="relative aspect-[4/5] overflow-hidden">
-                <Link to={`/product/${product.id}`} className="block h-full">
+                <Link to={`/product/${product.id}`} className="block h-full relative">
                     <img 
                         src={product.image} 
                         alt={product.name} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                        className={`w-full h-full object-cover transition-all duration-700 ${product.images && product.images.length > 1 ? 'group-hover:opacity-0' : 'group-hover:scale-110'}`} 
                     />
+                    {product.images && product.images.length > 1 && (
+                        <img 
+                            src={product.images[1]} 
+                            alt={product.name} 
+                            className="absolute inset-0 w-full h-full object-cover scale-110 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-700" 
+                        />
+                    )}
                 </Link>
                 
                 {/* Overlay actions */}

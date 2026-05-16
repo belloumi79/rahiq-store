@@ -44,7 +44,9 @@ export default function Checkout() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      const { error: orderError } = await supabase.from('orders').insert({
+      
+      // 1. Insert Order
+      const { data: orderData, error: orderError } = await supabase.from('orders').insert({
         full_name: form.name,
         phone: form.phone,
         delivery_address: `${form.address}${form.city ? ', ' + form.city : ''}`,
@@ -53,13 +55,30 @@ export default function Checkout() {
         total: cartTotal,
         status: 'pending',
         user_id: user?.id || null,
-        notes: form.notes || null,
-        items: items.map(i => ({ id: i.id, name: i.name, quantity: i.quantity, price: i.price }))
-      });
+        notes: form.notes || null
+      }).select().single();
+
       if (orderError) throw orderError;
+      if (!orderData) throw new Error('Failed to create order');
+
+      // 2. Insert Order Items
+      const orderItems = items.map(item => ({
+        order_id: orderData.id,
+        product_id: item.id,
+        product_name: item.name,
+        product_image: item.image,
+        quantity: item.quantity,
+        unit_price: item.price,
+        total_price: item.price * item.quantity
+      }));
+
+      const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
+      if (itemsError) throw itemsError;
+
       setStatus('success');
       clearCart();
     } catch (err: any) {
+      console.error('Checkout error:', err);
       setStatus('error');
       setErrorMsg(err.message || t('common.error'));
     }
