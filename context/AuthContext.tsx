@@ -76,6 +76,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         } finally {
             setIsAdmin(false);
             setUser(null);
+            localStorage.removeItem('rahiq-cart'); // Correct key
+            window.dispatchEvent(new Event('cart_updated')); // Custom event
         }
     };
 

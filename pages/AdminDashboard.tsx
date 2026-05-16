@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import supabase, { mapProductFromSupabase } from '../lib/supabase';
 import imageCompression from 'browser-image-compression';
 import { t } from '../i18n';
-import { Loader, Plus, Upload, Trash2, Edit2, Package, ShoppingBag, CheckCircle, FolderOpen, Mail, Phone, MapPin } from 'lucide-react';
+import { Loader, Plus, Upload, Trash2, Edit2, Package, ShoppingBag, CheckCircle, FolderOpen, Mail, Phone, MapPin, MessageSquare } from 'lucide-react';
 import RahiqLogo from '../components/RahiqLogo';
 
 const ADMIN_EMAIL = 'houdaboughalleb591@gmail.com';
@@ -50,10 +50,11 @@ const AdminDashboard: React.FC = () => {
     const navigate = useNavigate();
     const isAdmin = user?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 
-    const [activeTab, setActiveTab] = useState<'products' | 'categories' | 'orders'>('products');
+    const [activeTab, setActiveTab] = useState<'products' | 'categories' | 'orders' | 'forum'>('products');
     const [products, setProducts] = useState<ProductData[]>([]);
     const [categories, setCategories] = useState<CategoryData[]>([]);
     const [orders, setOrders] = useState<any[]>([]);
+    const [forumPosts, setForumPosts] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     const [isEditing, setIsEditing] = useState(false);
@@ -99,6 +100,10 @@ const AdminDashboard: React.FC = () => {
                     setIsLoading(true);
                     const { data } = await supabase.from('categories').select('*').order('name');
                     if (data) setCategories(data);
+                } else if (activeTab === 'forum') {
+                    setIsLoading(true);
+                    const { data } = await supabase.from('forum_posts').select('*').order('created_at', { ascending: false });
+                    if (data) setForumPosts(data);
                 } else {
                     const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
                     if (data) setOrders(data);
@@ -286,6 +291,15 @@ const AdminDashboard: React.FC = () => {
         } catch { alert('Erreur mise à jour'); }
     };
 
+    const handleDeleteForumPost = async (id: string) => {
+        if (!confirm("Supprimer ce post ?")) return;
+        try {
+            const { error } = await supabase.from('forum_posts').delete().eq('id', id);
+            if (error) throw error;
+            setForumPosts(forumPosts.filter(p => p.id !== id));
+        } catch { alert('Erreur lors de la suppression'); }
+    };
+
     const getCategoryName = (id: string) => categories.find(c => c.id === id)?.name || '—';
     const statusColors: Record<string, string> = {
         pending: 'bg-yellow-100 text-yellow-800',
@@ -321,6 +335,7 @@ const AdminDashboard: React.FC = () => {
                         { key: 'products', label: t('admin.tabProducts'), icon: <ShoppingBag size={16} /> },
                         { key: 'categories', label: t('admin.tabCategories'), icon: <FolderOpen size={16} /> },
                         { key: 'orders', label: t('admin.tabOrders'), icon: <Package size={16} /> },
+                        { key: 'forum', label: t('forum.title') || 'Forum', icon: <MessageSquare size={16} /> },
                     ].map(tab => (
                         <button key={tab.key} onClick={() => setActiveTab(tab.key as any)}
                             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors flex-shrink-0 ${activeTab === tab.key ? 'bg-amber-600 text-white' : 'text-amber-700 hover:bg-amber-50'}`}>
@@ -600,6 +615,24 @@ const AdminDashboard: React.FC = () => {
                                         </button>
                                     ))}
                                 </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* === FORUM TAB === */}
+                {activeTab === 'forum' && (
+                    <div className="space-y-3">
+                        {forumPosts.length === 0 ? (
+                            <div className="bg-white rounded-2xl p-8 text-center text-gray-400 shadow-sm border border-amber-100">Aucun post dans le forum</div>
+                        ) : forumPosts.map(post => (
+                            <div key={post.id} className="bg-white rounded-2xl p-4 shadow-sm border border-amber-100 flex justify-between items-start">
+                                <div>
+                                    <h3 className="font-bold text-amber-900 text-sm">{post.title}</h3>
+                                    <p className="text-xs text-gray-500 mt-1">{new Date(post.created_at).toLocaleDateString()}</p>
+                                    <p className="text-sm text-gray-700 mt-2 line-clamp-2">{post.content}</p>
+                                </div>
+                                <button onClick={() => handleDeleteForumPost(post.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
                             </div>
                         ))}
                     </div>

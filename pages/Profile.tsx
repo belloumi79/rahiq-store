@@ -13,8 +13,10 @@ const Profile: React.FC = () => {
     if (!user) { navigate('/login'); return null; }
 
     const signOut = async () => {
-        await logout();
-        navigate('/login');
+        if (window.confirm(t('profile.confirmLogout') || 'Êtes-vous sûr de vouloir vous déconnecter ? / Are you sure you want to log out?')) {
+            await logout();
+            navigate('/login');
+        }
     };
 
     return (

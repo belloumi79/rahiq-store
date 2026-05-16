@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, ShoppingBag, ShoppingCart, User, Instagram, Menu, X } from 'lucide-react';
+import { Home, ShoppingBag, ShoppingCart, User, Instagram, Menu, X, MessageSquare } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -42,6 +42,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {[
                 { to: '/', label: t('nav.home'), icon: <Home size={18} /> },
                 { to: '/marketplace', label: t('nav.marketplace'), icon: <ShoppingBag size={18} /> },
+                { to: '/forum', label: t('forum.title') || 'Forum', icon: <MessageSquare size={18} /> },
                 { to: '/cart', label: t('nav.cart'), icon: <ShoppingCart size={18} /> },
               ].map((link) => (
                 <Link 
@@ -110,6 +111,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 {[
                   { to: '/', label: t('nav.home'), icon: <Home size={18} /> },
                   { to: '/marketplace', label: t('nav.marketplace'), icon: <ShoppingBag size={18} /> },
+                  { to: '/forum', label: t('forum.title') || 'Forum', icon: <MessageSquare size={18} /> },
                   { to: '/cart', label: t('nav.cart'), icon: <ShoppingCart size={18} /> },
                   ...(user ? [{ to: '/profile', label: t('nav.profile'), icon: <User size={18} /> }] : [{ to: '/login', label: t('nav.login'), icon: <User size={18} /> }])
                 ].map((link) => (

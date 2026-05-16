@@ -13,6 +13,8 @@ import Login from './pages/Login';
 import Orders from './pages/Orders';
 import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
+import Forum from './pages/Forum';
+import ForumPost from './pages/ForumPost';
 
 export default function App() {
   return (
@@ -31,6 +33,8 @@ export default function App() {
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/forum" element={<Forum />} />
+                <Route path="/forum/:id" element={<ForumPost />} />
               </Routes>
             </Layout>
           </HashRouter>
