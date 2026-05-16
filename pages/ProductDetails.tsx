@@ -14,6 +14,7 @@ const ProductDetails: React.FC = () => {
     const navigate = useNavigate();
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
+    const [selectedImage, setSelectedImage] = useState<string>('');
     const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
@@ -23,7 +24,11 @@ const ProductDetails: React.FC = () => {
                 const { data } = await supabase
                     .from('products').select('*, categories(name,image,slug)')
                     .eq('id', id).single();
-                if (data) setProduct(mapProductFromSupabase(data));
+                if (data) {
+                    const mapped = mapProductFromSupabase(data);
+                    setProduct(mapped);
+                    setSelectedImage(mapped.image);
+                }
             } finally {
                 setLoading(false);
             }
@@ -48,6 +53,8 @@ const ProductDetails: React.FC = () => {
         <div dir={dir} className="text-center py-16 text-gray-400">{t('marketplace.noProducts')}</div>
     );
 
+    const images = product.images && product.images.length > 0 ? product.images : [product.image];
+
     return (
         <div dir={dir} className="max-w-6xl mx-auto px-4 py-8">
             <button
@@ -56,26 +63,40 @@ const ProductDetails: React.FC = () => {
             >
                 <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> {t('common.back')}
             </button>
-
++
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
                 <motion.div 
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
                     className="space-y-6"
                 >
-                    <div className="aspect-square rounded-[3rem] overflow-hidden shadow-2xl shadow-amber-900/10 border border-amber-50">
-                        <img 
-                            src={product.image} 
-                            alt={product.name} 
-                            className="w-full h-full object-cover" 
-                        />
+                    <div className="aspect-square rounded-[3rem] overflow-hidden shadow-2xl shadow-amber-900/10 border border-amber-50 bg-white">
+                        <AnimatePresence mode="wait">
+                            <motion.img 
+                                key={selectedImage}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                src={selectedImage} 
+                                alt={product.name} 
+                                className="w-full h-full object-cover" 
+                            />
+                        </AnimatePresence>
                     </div>
                     
-                    <div className="flex gap-4">
-                        <div className="w-24 h-24 rounded-2xl border-2 border-amber-500 overflow-hidden cursor-pointer">
-                            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                    {images.length > 1 && (
+                        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                            {images.map((img, idx) => (
+                                <button 
+                                    key={idx}
+                                    onClick={() => setSelectedImage(img)}
+                                    className={`relative w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden border-2 transition-all ${selectedImage === img ? 'border-amber-600 ring-4 ring-amber-100' : 'border-transparent hover:border-amber-200'}`}
+                                >
+                                    <img src={img} alt="" className="w-full h-full object-cover" />
+                                </button>
+                            ))}
                         </div>
-                    </div>
+                    )}
                 </motion.div>
 
                 <motion.div 

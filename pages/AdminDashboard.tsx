@@ -13,6 +13,9 @@ const ADMIN_EMAIL = 'houdaboughalleb591@gmail.com';
 interface CategoryData {
     id: string;
     name: string;
+    name_ar?: string;
+    name_fr?: string;
+    name_en?: string;
     slug: string;
     image: string;
     created_at?: string;
@@ -21,13 +24,20 @@ interface CategoryData {
 interface ProductData {
     id: string;
     name: string;
+    name_ar?: string;
+    name_fr?: string;
+    name_en?: string;
     category_id: string;
     price: number;
     description: string;
+    description_ar?: string;
+    description_fr?: string;
+    description_en?: string;
     producer: string;
     is_organic: boolean;
     is_artisanal: boolean;
     image: string;
+    images?: string[];
     benefits: string[];
     ingredients: string[];
     stock: number;
@@ -49,15 +59,20 @@ const AdminDashboard: React.FC = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
-        name: '', category_id: '', price: '', description: '',
-        producer: '', isOrganic: false, isArtisanal: false, image: ''
+        name_ar: '', name_fr: '', name_en: '',
+        category_id: '', price: '',
+        description_ar: '', description_fr: '', description_en: '',
+        producer: '', isOrganic: false, isArtisanal: false, image: '', images: [] as string[]
     });
 
-    const [catName, setCatName] = useState('');
+    const [catNameAr, setCatNameAr] = useState('');
+    const [catNameFr, setCatNameFr] = useState('');
+    const [catNameEn, setCatNameEn] = useState('');
     const [catSlug, setCatSlug] = useState('');
     const [catImage, setCatImage] = useState('');
     const [isEditingCategory, setIsEditingCategory] = useState(false);
     const [editCategoryId, setEditCategoryId] = useState<string | null>(null);
+    const [formLang, setFormLang] = useState<'ar' | 'fr' | 'en'>('ar');
 
     const [uploading, setUploading] = useState(false);
 
@@ -98,31 +113,63 @@ const AdminDashboard: React.FC = () => {
         try {
             if (!event.target.files || event.target.files.length === 0) return;
             setUploading(true);
-            const file = event.target.files[0];
+            const files = Array.from(event.target.files);
             const options = { maxWidth: 1200, useWebWorker: true, toWebp: true, quality: 0.7 };
-            const compressedFile = await imageCompression(file, options);
-            const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.webp`;
-            const { error: uploadError } = await supabase.storage.from('rahiq-store').upload(fileName, compressedFile, { contentType: 'image/webp' });
-            if (uploadError) throw uploadError;
-            const { data } = supabase.storage.from('rahiq-store').getPublicUrl(fileName);
-            if (target === 'product') setFormData(prev => ({ ...prev, image: data.publicUrl }));
-            else setCatImage(data.publicUrl);
+            
+            const uploadPromises = files.map(async (file) => {
+                const compressedFile = await imageCompression(file, options);
+                const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.webp`;
+                const { error: uploadError } = await supabase.storage.from('rahiq-store').upload(fileName, compressedFile, { contentType: 'image/webp' });
+                if (uploadError) throw uploadError;
+                const { data } = supabase.storage.from('rahiq-store').getPublicUrl(fileName);
+                return data.publicUrl;
+            });
+
+            const newUrls = await Promise.all(uploadPromises);
+
+            if (target === 'product') {
+                setFormData(prev => ({ 
+                    ...prev, 
+                    images: [...(prev.images || []), ...newUrls],
+                    image: prev.image || newUrls[0]
+                }));
+            } else {
+                setCatImage(newUrls[0]);
+            }
         } catch (error) { alert('Erreur upload image'); console.error(error); }
         finally { setUploading(false); }
+    };
+
+    const removeProductImage = (urlToRemove: string) => {
+        setFormData(prev => {
+            const newImages = (prev.images || []).filter(url => url !== urlToRemove);
+            return {
+                ...prev,
+                images: newImages,
+                image: prev.image === urlToRemove ? (newImages[0] || '') : prev.image
+            };
+        });
     };
 
     const handleSubmitProduct = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         const productData = {
-            name: formData.name,
+            name: formData.name_ar || formData.name_fr || formData.name_en,
+            name_ar: formData.name_ar,
+            name_fr: formData.name_fr,
+            name_en: formData.name_en,
             category_id: formData.category_id || null,
             price: parseFloat(formData.price),
-            description: formData.description,
+            description: formData.description_ar || formData.description_fr || formData.description_en,
+            description_ar: formData.description_ar,
+            description_fr: formData.description_fr,
+            description_en: formData.description_en,
             producer: formData.producer,
             is_organic: formData.isOrganic,
             is_artisanal: formData.isArtisanal,
             image: formData.image,
+            images: formData.images,
             benefits: [],
             ingredients: [],
             stock: 0
@@ -136,7 +183,12 @@ const AdminDashboard: React.FC = () => {
                 if (error) throw error;
             }
             setIsEditing(false); setEditId(null);
-            setFormData({ name: '', category_id: '', price: '', description: '', producer: '', isOrganic: false, isArtisanal: false, image: '' });
+            setFormData({ 
+                name_ar: '', name_fr: '', name_en: '', 
+                category_id: '', price: '', 
+                description_ar: '', description_fr: '', description_en: '', 
+                producer: '', isOrganic: false, isArtisanal: false, image: '', images: []
+            });
             setActiveTab(activeTab);
         } catch (error: any) { alert(`Erreur: ${error.message}`); }
         finally { setIsLoading(false); }
@@ -154,23 +206,46 @@ const AdminDashboard: React.FC = () => {
     const startEdit = (product: ProductData) => {
         setIsEditing(true); setEditId(product.id);
         setFormData({
-            name: product.name, category_id: product.category_id || '', price: product.price.toString(),
-            description: product.description, producer: product.producer,
-            isOrganic: product.is_organic, isArtisanal: product.is_artisanal, image: product.image
+            name_ar: product.name_ar || product.name || '',
+            name_fr: product.name_fr || '',
+            name_en: product.name_en || '',
+            category_id: product.category_id || '',
+            price: product.price.toString(),
+            description_ar: product.description_ar || product.description || '',
+            description_fr: product.description_fr || '',
+            description_en: product.description_en || '',
+            producer: product.producer,
+            isOrganic: product.is_organic,
+            isArtisanal: product.is_artisanal,
+            image: product.image || (product.images && product.images.length > 0 ? product.images[0] : ''),
+            images: product.images || (product.image ? [product.image] : [])
         });
     };
 
     const cancelEdit = () => {
         setIsEditing(false); setEditId(null);
-        setFormData({ name: '', category_id: '', price: '', description: '', producer: '', isOrganic: false, isArtisanal: false, image: '' });
+        setFormData({ 
+            name_ar: '', name_fr: '', name_en: '', 
+            category_id: '', price: '', 
+            description_ar: '', description_fr: '', description_en: '', 
+            producer: '', isOrganic: false, isArtisanal: false, image: '', images: []
+        });
     };
 
     const handleSubmitCategory = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!catName.trim()) { alert('Le nom est requis'); return; }
+        const mainName = catNameAr || catNameFr || catNameEn;
+        if (!mainName.trim()) { alert('Le nom est requis'); return; }
         setIsLoading(true);
         try {
-            const data = { name: catName.trim(), slug: slugify(catName), image: catImage };
+            const data = { 
+                name: mainName.trim(), 
+                name_ar: catNameAr.trim(),
+                name_fr: catNameFr.trim(),
+                name_en: catNameEn.trim(),
+                slug: catSlug || slugify(mainName), 
+                image: catImage 
+            };
             if (isEditingCategory && editCategoryId) {
                 const { error } = await supabase.from('categories').update(data).eq('id', editCategoryId);
                 if (error) throw error;
@@ -179,7 +254,7 @@ const AdminDashboard: React.FC = () => {
                 if (error) throw error;
             }
             setIsEditingCategory(false); setEditCategoryId(null);
-            setCatName(''); setCatSlug(''); setCatImage('');
+            setCatNameAr(''); setCatNameFr(''); setCatNameEn(''); setCatSlug(''); setCatImage('');
             setActiveTab(activeTab);
         } catch (error: any) { alert(`Erreur: ${error.message}`); }
         finally { setIsLoading(false); }
@@ -196,7 +271,11 @@ const AdminDashboard: React.FC = () => {
 
     const startEditCategory = (cat: CategoryData) => {
         setIsEditingCategory(true); setEditCategoryId(cat.id);
-        setCatName(cat.name); setCatSlug(cat.slug); setCatImage(cat.image);
+        setCatNameAr(cat.name_ar || cat.name || '');
+        setCatNameFr(cat.name_fr || '');
+        setCatNameEn(cat.name_en || '');
+        setCatSlug(cat.slug);
+        setCatImage(cat.image);
     };
 
     const updateOrderStatus = async (id: string, status: string) => {
@@ -258,10 +337,24 @@ const AdminDashboard: React.FC = () => {
                             <h2 className="text-base font-bold text-amber-900 mb-4">
                                 {isEditing ? t('admin.editProduct') : t('admin.addProduct')}
                             </h2>
+                            <div className="flex gap-2 mb-4 bg-amber-50 p-1 rounded-xl w-fit">
+                                {['ar', 'fr', 'en'].map((l) => (
+                                    <button key={l} type="button" onClick={() => setFormLang(l as any)}
+                                        className={`px-3 py-1 rounded-lg text-xs font-bold uppercase transition-colors ${formLang === l ? 'bg-amber-600 text-white' : 'text-amber-700 hover:bg-amber-100'}`}>
+                                        {l}
+                                    </button>
+                                ))}
+                            </div>
                             <form onSubmit={handleSubmitProduct} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.name')}</label>
-                                    <input value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))} required
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                                        {t('admin.name')} ({formLang.toUpperCase()})
+                                    </label>
+                                    <input 
+                                        value={formLang === 'ar' ? formData.name_ar : formLang === 'fr' ? formData.name_fr : formData.name_en} 
+                                        onChange={e => setFormData(p => ({ ...p, [`name_${formLang}`]: e.target.value }))} 
+                                        required={formLang === 'ar'}
+                                        dir={formLang === 'ar' ? 'rtl' : 'ltr'}
                                         className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
                                 </div>
                                 <div>
@@ -289,20 +382,51 @@ const AdminDashboard: React.FC = () => {
                                         className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.description')}</label>
-                                    <textarea value={formData.description}
-                                        onChange={e => setFormData(p => ({ ...p, description: e.target.value }))} rows={3}
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                                        {t('admin.description')} ({formLang.toUpperCase()})
+                                    </label>
+                                    <textarea 
+                                        value={formLang === 'ar' ? formData.description_ar : formLang === 'fr' ? formData.description_fr : formData.description_en}
+                                        onChange={e => setFormData(p => ({ ...p, [`description_${formLang}`]: e.target.value }))} 
+                                        rows={3}
+                                        dir={formLang === 'ar' ? 'rtl' : 'ltr'}
                                         className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.image')}</label>
-                                    <div className="flex items-center gap-3">
-                                        <label className="cursor-pointer flex items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-700 px-4 py-2.5 rounded-xl text-sm font-medium">
-                                            <Upload size={16} />{uploading ? t('common.loading') : t('admin.uploadImage')}
-                                            <input type="file" accept="image/*" className="hidden"
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.image')} (Galerie)</label>
+                                    <div className="flex flex-wrap gap-3 p-4 border-2 border-dashed border-amber-200 rounded-2xl bg-amber-50/30">
+                                        {(formData.images || []).map((url, idx) => (
+                                            <div key={idx} className="relative group w-24 h-24 rounded-xl overflow-hidden shadow-sm border border-amber-100">
+                                                <img src={url} alt="" className="w-full h-full object-cover" />
+                                                <button 
+                                                    type="button"
+                                                    onClick={() => removeProductImage(url)}
+                                                    className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    <Trash2 size={12} />
+                                                </button>
+                                                {formData.image === url && (
+                                                    <div className="absolute bottom-0 inset-x-0 bg-amber-600 text-white text-[10px] font-bold text-center py-0.5">
+                                                        Principale
+                                                    </div>
+                                                )}
+                                                {formData.image !== url && (
+                                                    <button 
+                                                        type="button"
+                                                        onClick={() => setFormData(p => ({ ...p, image: url }))}
+                                                        className="absolute inset-0 bg-black/40 text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >
+                                                        Définir principale
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                        <label className="w-24 h-24 flex flex-col items-center justify-center gap-1 border-2 border-dashed border-amber-300 rounded-xl cursor-pointer hover:bg-amber-100 hover:border-amber-400 transition-all text-amber-600">
+                                            <Upload size={20} />
+                                            <span className="text-[10px] font-bold uppercase">{uploading ? '...' : t('admin.uploadImage')}</span>
+                                            <input type="file" accept="image/*" multiple className="hidden"
                                                 onChange={e => handleImageUpload(e, 'product')} disabled={uploading} />
                                         </label>
-                                        {formData.image && <img src={formData.image} alt="" className="h-12 w-12 object-cover rounded-xl" />}
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4 md:col-span-2">
@@ -379,12 +503,31 @@ const AdminDashboard: React.FC = () => {
                     <div className="space-y-4">
                         <div className="bg-white rounded-2xl p-5 shadow-sm border border-amber-100">
                             <h2 className="text-base font-bold text-amber-900 mb-4">{isEditingCategory ? t('admin.editCategory') : t('admin.addCategory')}</h2>
+                            <div className="flex gap-2 mb-4 bg-amber-50 p-1 rounded-xl w-fit">
+                                {['ar', 'fr', 'en'].map((l) => (
+                                   <button key={l} type="button" onClick={() => setFormLang(l as any)}
+                                       className={`px-3 py-1 rounded-lg text-xs font-bold uppercase transition-colors ${formLang === l ? 'bg-amber-600 text-white' : 'text-amber-700 hover:bg-amber-100'}`}>
+                                       {l}
+                                   </button>
+                                ))}
+                            </div>
                             <form onSubmit={handleSubmitCategory} className="flex flex-col md:flex-row gap-3 items-end">
                                 <div className="flex-1">
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('admin.categoryName')}</label>
-                                    <input value={catName}
-                                        onChange={e => { setCatName(e.target.value); setCatSlug(slugify(e.target.value)); }}
-                                        required placeholder="Ex: Miel de Thym"
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                                        {t('admin.categoryName')} ({formLang.toUpperCase()})
+                                    </label>
+                                    <input 
+                                        value={formLang === 'ar' ? catNameAr : formLang === 'fr' ? catNameFr : catNameEn}
+                                        onChange={e => {
+                                            const val = e.target.value;
+                                            if (formLang === 'ar') setCatNameAr(val);
+                                            else if (formLang === 'fr') setCatNameFr(val);
+                                            else setCatNameEn(val);
+                                            if (!catSlug) setCatSlug(slugify(val));
+                                        }}
+                                        required={formLang === 'ar'}
+                                        dir={formLang === 'ar' ? 'rtl' : 'ltr'}
+                                        placeholder="Ex: Miel de Thym"
                                         className="w-full border border-amber-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400" />
                                 </div>
                                 <div className="w-full md:w-48">
@@ -407,7 +550,7 @@ const AdminDashboard: React.FC = () => {
                                     {isLoading ? <Loader className="animate-spin" size={16} /> : <CheckCircle size={16} />}{t('admin.save')}
                                 </button>
                                 {isEditingCategory && (
-                                    <button type="button" onClick={() => { setIsEditingCategory(false); setCatName(''); setCatSlug(''); setCatImage(''); }}
+                                    <button type="button" onClick={() => { setIsEditingCategory(false); setCatNameAr(''); setCatNameFr(''); setCatNameEn(''); setCatSlug(''); setCatImage(''); }}
                                         className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-6 py-2.5 rounded-xl text-sm font-medium">{t('admin.cancel')}</button>
                                 )}
                             </form>
